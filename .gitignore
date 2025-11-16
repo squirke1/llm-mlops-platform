@@ -61,3 +61,7 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Documentation (except README)
+*.md
+!README.md
