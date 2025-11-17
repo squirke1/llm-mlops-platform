@@ -65,3 +65,4 @@ htmlcov/
 # Documentation (except README)
 *.md
 !README.md
+!ROADMAP.md
