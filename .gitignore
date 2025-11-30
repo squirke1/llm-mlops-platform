@@ -62,7 +62,7 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Documentation (except README)
-*.md
+# Documentation (only root-level MDs except README and ROADMAP)
+/*.md
 !README.md
 !ROADMAP.md
