@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black==23.12.1 flake8==7.0.0 isort==5.13.2 mypy==1.8.0
+
+      - name: Check code formatting with Black
+        run: |
+          black --check src/ api/ tests/
+
+      - name: Check import sorting with isort
+        run: |
+          isort --check-only src/ api/ tests/
+
+      - name: Lint with flake8
+        run: |
+          flake8 src/ api/ tests/ --count --show-source --statistics
+
+      - name: Type check with mypy
+        run: |
+          mypy src/ api/ --ignore-missing-imports
+        continue-on-error: true
