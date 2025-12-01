@@ -1,0 +1,83 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - staging
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    # Uncomment when AWS credentials are configured
+    # environment: ${{ github.event.inputs.environment || 'prod' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # These secrets need to be configured in GitHub repository settings
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+        # Comment out until credentials are added
+        if: false
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        if: false
+
+      - name: Build, tag, and push image to Amazon ECR
+        if: false
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mlops-platform-prod-api
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Update kubeconfig
+        if: false
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name mlops-platform-prod-cluster
+
+      - name: Deploy to EKS
+        if: false
+        run: |
+          kubectl apply -k k8s/
+          kubectl rollout status deployment/churn-prediction-api -n mlops-platform
+
+      - name: Verify deployment
+        if: false
+        run: |
+          kubectl get pods -n mlops-platform
+          kubectl get services -n mlops-platform
+          kubectl get ingress -n mlops-platform
+
+      # Placeholder for actual deployment (local testing)
+      - name: Deployment Status (Placeholder)
+        run: |
+          echo "🚀 Deployment workflow configured"
+          echo "📝 To enable AWS deployment:"
+          echo "   1. Add AWS_ACCESS_KEY_ID to GitHub Secrets"
+          echo "   2. Add AWS_SECRET_ACCESS_KEY to GitHub Secrets"
+          echo "   3. Deploy infrastructure: terraform apply"
+          echo "   4. Remove 'if: false' conditions from steps above"
+          echo ""
+          echo "✅ For now, test locally with Minikube"
