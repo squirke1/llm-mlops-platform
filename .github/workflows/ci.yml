@@ -74,7 +74,8 @@ jobs:
 
       - name: Validate Kubernetes YAML
         run: |
-          kubectl apply --dry-run=client -k k8s/
+          # Render kustomize locally and validate client-side (no cluster required)
+          kubectl kustomize k8s/ | kubectl apply --dry-run=client -f -
 
   validate-terraform:
     name: Validate Terraform
