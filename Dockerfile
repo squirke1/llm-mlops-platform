@@ -25,6 +25,7 @@ COPY --from=builder /root/.local /root/.local
 
 # Make sure scripts in .local are usable
 ENV PATH=/root/.local/bin:$PATH
+ENV PYTHONPATH=/root/.local/lib/python3.9/site-packages:$PYTHONPATH
 
 # Copy application code
 COPY src/ ./src/
