@@ -77,10 +77,16 @@ jobs:
         with:
           version: 'v1.28.0'
 
+      - name: Install kubeconform
+        run: |
+          curl -L https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
+            | tar -xz -C /usr/local/bin kubeconform
+
       - name: Validate Kubernetes YAML
         run: |
           # Render kustomize locally and validate client-side (no cluster required)
-          kubectl kustomize k8s/ | kubectl apply --dry-run=client -f -
+          kustomize build k8s/ > /tmp/k8s-rendered.yaml
+          kubeconform -strict -summary -kubernetes-version 1.28.0 /tmp/k8s-rendered.yaml
 
   validate-terraform:
     name: Validate Terraform
