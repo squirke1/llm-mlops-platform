@@ -29,7 +29,10 @@ ENV PATH=/root/.local/bin:$PATH
 # Copy application code
 COPY src/ ./src/
 COPY api/ ./api/
-COPY models/ ./models/
+
+# Create models directory and train model
+RUN mkdir -p models && \
+    python src/train.py
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && \
