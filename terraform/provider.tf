@@ -6,10 +6,12 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.23"
-    }
+    # Kubernetes provider removed for CI validation
+    # Re-enable when deploying to actual EKS cluster
+    # kubernetes = {
+    #   source  = "hashicorp/kubernetes"
+    #   version = "~> 2.23"
+    # }
   }
 
   # Backend configuration should be provided via backend config file or CLI
