@@ -1,7 +1,7 @@
 # Dockerfile for MLOps Platform - Customer Churn Prediction API
 
 # Stage 1: Builder
-FROM python:3.9-slim as builder
+FROM python:3.9-slim AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Stage 2: Runtime
@@ -21,11 +21,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
-
-# Make sure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
-ENV PYTHONPATH=/root/.local/lib/python3.9/site-packages:$PYTHONPATH
+COPY --from=builder /usr/local /usr/local
 
 # Copy application code
 COPY src/ ./src/
