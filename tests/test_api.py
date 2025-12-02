@@ -18,9 +18,17 @@ from src.model import ChurnModel  # noqa: E402
 def setup_model():
     """Load model before running tests."""
     model_path = Path("models/churn_model.pkl")
-    if model_path.exists():
-        app_module.model = ChurnModel.load(model_path)
+    if not model_path.exists():
+        # Train model if it doesn't exist
+        import subprocess
+
+        subprocess.run(["python", "src/train.py"], check=True)
+
+    # Load model into app
+    app_module.model = ChurnModel.load(model_path)
     yield
+    # Cleanup
+    app_module.model = None
 
 
 client = TestClient(app)
