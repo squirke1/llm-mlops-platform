@@ -17,9 +17,7 @@ class ChurnModel:
             n_estimators: Number of trees in the forest
             random_state: Random seed for reproducibility
         """
-        self.model = RandomForestClassifier(
-            n_estimators=n_estimators, random_state=random_state
-        )
+        self.model = RandomForestClassifier(n_estimators=n_estimators, random_state=random_state)
         self.metrics = {}
 
     def train(self, X, y):
@@ -33,9 +31,7 @@ class ChurnModel:
         Returns:
             Dictionary of evaluation metrics
         """
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         self.model.fit(X_train, y_train)
 
         y_pred = self.model.predict(X_test)

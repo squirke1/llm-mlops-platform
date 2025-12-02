@@ -40,6 +40,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+      - name: Train model for tests
+        run: |
+          cd src && python train.py
       - name: Run tests
         run: |
           pytest tests/ -v
@@ -64,14 +67,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "5.3.0"
+
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.28.0'
 
+      - name: Install kubeconform
+        run: |
+          curl -L https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
+            | tar -xz -C /usr/local/bin kubeconform
+
       - name: Validate Kubernetes YAML
         run: |
-          kubectl apply --dry-run=client -k k8s/
+          # Render kustomize locally and validate client-side (no cluster required)
+          kustomize build k8s/ > /tmp/k8s-rendered.yaml
+          kubeconform -strict -summary -kubernetes-version 1.28.0 /tmp/k8s-rendered.yaml
 
   validate-terraform:
     name: Validate Terraform

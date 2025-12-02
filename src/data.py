@@ -21,9 +21,7 @@ def generate_churn_data(n_samples=1000, random_state=42):
         "tenure_months": np.random.randint(1, 72, n_samples),
         "monthly_charges": np.random.uniform(20, 120, n_samples),
         "total_charges": np.random.uniform(100, 8000, n_samples),
-        "contract_type": np.random.choice(
-            ["Month-to-month", "One year", "Two year"], n_samples
-        ),
+        "contract_type": np.random.choice(["Month-to-month", "One year", "Two year"], n_samples),
         "num_support_tickets": np.random.poisson(2, n_samples),
     }
 
