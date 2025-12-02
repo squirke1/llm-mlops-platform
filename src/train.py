@@ -1,6 +1,5 @@
 """Train the customer churn prediction model."""
 
-import os
 from pathlib import Path
 
 import pandas as pd
