@@ -117,12 +117,13 @@ async def predict_churn(request: ChurnPredictionRequest):
 
     # Track prediction in progress
     active_predictions.inc()
-    
+
     try:
         # Start timing
         import time
+
         start_time = time.time()
-        
+
         # Prepare input data
         input_data = pd.DataFrame(
             [
@@ -171,7 +172,7 @@ async def predict_churn(request: ChurnPredictionRequest):
         prediction_counter.labels(prediction_result=prediction_label).inc()
         model_confidence.set(probability)
         active_predictions.dec()
-        
+
         return ChurnPredictionResponse(
             prediction=int(prediction), probability=round(probability, 3)
         )
