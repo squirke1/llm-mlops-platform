@@ -6,6 +6,8 @@ from pathlib import Path
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import Counter, Gauge, Histogram
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -37,6 +39,29 @@ app.add_middleware(
 
 # Global model variable
 model = None
+
+# Prometheus metrics
+prediction_counter = Counter(
+    "churn_predictions_total",
+    "Total number of churn predictions",
+    ["prediction_result"],
+)
+prediction_latency = Histogram(
+    "churn_prediction_duration_seconds",
+    "Time spent processing prediction requests",
+)
+model_confidence = Gauge(
+    "churn_model_confidence",
+    "Average confidence score of predictions",
+)
+active_predictions = Gauge(
+    "churn_predictions_in_progress",
+    "Number of predictions currently being processed",
+)
+
+
+# Initialize Prometheus instrumentation
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 
 @app.on_event("startup")
@@ -90,7 +115,15 @@ async def predict_churn(request: ChurnPredictionRequest):
             status_code=503, detail="Model not loaded. Please train the model first."
         )
 
+    # Track prediction in progress
+    active_predictions.inc()
+
     try:
+        # Start timing
+        import time
+
+        start_time = time.time()
+
         # Prepare input data
         input_data = pd.DataFrame(
             [
@@ -133,11 +166,19 @@ async def predict_churn(request: ChurnPredictionRequest):
         else:
             probability = float(prediction)
 
+        # Record metrics
+        prediction_latency.observe(time.time() - start_time)
+        prediction_label = "churn" if prediction == 1 else "no_churn"
+        prediction_counter.labels(prediction_result=prediction_label).inc()
+        model_confidence.set(probability)
+        active_predictions.dec()
+
         return ChurnPredictionResponse(
             prediction=int(prediction), probability=round(probability, 3)
         )
 
     except Exception as e:
+        active_predictions.dec()
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 

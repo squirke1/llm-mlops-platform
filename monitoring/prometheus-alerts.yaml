@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alerts
+  namespace: mlops-platform
+data:
+  alerts.yml: |
+    groups:
+    - name: churn_api_alerts
+      interval: 30s
+      rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+      
+      # Slow API responses
+      - alert: SlowAPIResponse
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API response time is slow"
+          description: "95th percentile response time is {{ $value }}s (threshold: 2s)"
+      
+      # Low prediction throughput
+      - alert: LowPredictionThroughput
+        expr: |
+          rate(churn_predictions_total[5m]) < 0.01
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low prediction throughput"
+          description: "Prediction rate is {{ $value }} per second (expected: > 0.01/s)"
+      
+      # Model not loaded
+      - alert: ModelNotLoaded
+        expr: |
+          up{job="churn-api"} == 1 and absent(churn_predictions_total)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Model is not loaded"
+          description: "API is up but model metrics are missing"
+      
+      # High churn rate
+      - alert: HighChurnRate
+        expr: |
+          rate(churn_predictions_total{prediction_result="churn"}[1h]) / rate(churn_predictions_total[1h]) > 0.5
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "High churn prediction rate"
+          description: "{{ $value | humanizePercentage }} of predictions are churn (threshold: 50%)"
+      
+      # API pod down
+      - alert: APIPodDown
+        expr: |
+          up{job="churn-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Churn API pod is down"
+          description: "Cannot scrape metrics from churn-api"
