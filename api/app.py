@@ -17,6 +17,7 @@ from api.schemas import (  # noqa: E402
     ChurnPredictionResponse,
     HealthResponse,
 )
+from src.mlflow_utils import load_model_from_registry  # noqa: E402
 from src.model import ChurnModel  # noqa: E402
 
 # Initialize FastAPI app
@@ -68,19 +69,38 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 async def load_model():
     """Load the trained model on startup."""
     global model
-    model_path = Path("models/churn_model.pkl")
 
-    if not model_path.exists():
-        print(f"Warning: Model file not found at {model_path}")
-        print("Please train the model first by running: python src/train.py")
-        model = None
+    # Try loading from MLflow registry first
+    print("Attempting to load model from MLflow registry...")
+    mlflow_model = load_model_from_registry(model_name="churn-prediction-model", stage="Production")
+
+    if mlflow_model is not None:
+        # Wrap MLflow model to match ChurnModel interface
+        class MLflowModelWrapper:
+            def __init__(self, mlflow_model):
+                self.model = mlflow_model
+
+            def predict(self, X):
+                return self.model.predict(X)
+
+        model = MLflowModelWrapper(mlflow_model)
+        print("Model loaded successfully from MLflow registry (Production stage)")
     else:
-        try:
-            model = ChurnModel.load(model_path)
-            print(f"Model loaded successfully from {model_path}")
-        except Exception as e:
-            print(f"Error loading model: {e}")
+        # Fallback to local file
+        print("Falling back to local model file...")
+        model_path = Path("models/churn_model.pkl")
+
+        if not model_path.exists():
+            print(f"Warning: Model file not found at {model_path}")
+            print("Please train the model first by running: python src/train.py")
             model = None
+        else:
+            try:
+                model = ChurnModel.load(model_path)
+                print(f"Model loaded successfully from {model_path}")
+            except Exception as e:
+                print(f"Error loading model: {e}")
+                model = None
 
 
 @app.get("/", tags=["Root"])
