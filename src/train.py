@@ -12,12 +12,20 @@ from model import ChurnModel
 
 def main():
     """Train and save the churn prediction model."""
-    # Set MLflow tracking URI and experiment
-    mlflow.set_tracking_uri("http://localhost:5000")  # MLflow server
-    mlflow.set_experiment("churn-prediction")
+    import os
 
-    # Start MLflow run
-    with mlflow.start_run(run_name="churn-model-training"):
+    # Check if MLflow should be used
+    use_mlflow = os.getenv("USE_MLFLOW", "false").lower() == "true"
+
+    if use_mlflow:
+        # Set MLflow tracking URI and experiment
+        mlflow_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
+        mlflow.set_tracking_uri(mlflow_uri)
+        mlflow.set_experiment("churn-prediction")
+        print(f"MLflow tracking enabled: {mlflow_uri}")
+        mlflow.start_run(run_name="churn-model-training")
+    else:
+        print("MLflow tracking disabled (set USE_MLFLOW=true to enable)")
         print("Generating training data...")
         df = generate_churn_data(n_samples=1000, random_state=42)
 
@@ -37,41 +45,43 @@ def main():
         mlflow.log_param("n_samples", len(df))
         mlflow.log_param("n_features", X.shape[1])
 
-        # Train model
-        print("Training model...")
-        model = ChurnModel(n_estimators=n_estimators, random_state=random_state)
-        metrics = model.train(X, y)
+    # Train model
+    print("Training model...")
+    model = ChurnModel(n_estimators=n_estimators, random_state=random_state)
+    metrics = model.train(X, y)
 
-        # Log metrics
+    # Log metrics to MLflow if enabled
+    if use_mlflow:
         mlflow.log_metric("accuracy", metrics["accuracy"])
         mlflow.log_metric("precision", metrics["precision"])
         mlflow.log_metric("recall", metrics["recall"])
 
-        # Print metrics
-        print("\nModel Performance:")
-        print(f"  Accuracy:  {metrics['accuracy']:.3f}")
-        print(f"  Precision: {metrics['precision']:.3f}")
-        print(f"  Recall:    {metrics['recall']:.3f}")
+    # Print metrics
+    print("\nModel Performance:")
+    print(f"  Accuracy:  {metrics['accuracy']:.3f}")
+    print(f"  Precision: {metrics['precision']:.3f}")
+    print(f"  Recall:    {metrics['recall']:.3f}")
 
-        # Save model locally
-        models_dir = Path("models")
-        models_dir.mkdir(exist_ok=True)
-        model_path = models_dir / "churn_model.pkl"
-        model.save(model_path)
-        print(f"\nModel saved to {model_path}")
+    # Save model locally
+    models_dir = Path("models")
+    models_dir.mkdir(exist_ok=True)
+    model_path = models_dir / "churn_model.pkl"
+    model.save(model_path)
+    print(f"\nModel saved to {model_path}")
 
-        # Log model to MLflow
+    # Log model to MLflow if enabled
+    if use_mlflow:
         mlflow.sklearn.log_model(
             model.model,
             "model",
             registered_model_name="churn-prediction-model",
             signature=mlflow.models.infer_signature(X, model.predict(X)),
         )
-
-        # Log artifacts
         mlflow.log_artifact(str(model_path), "model-files")
-
         print(f"\nMLflow run ID: {mlflow.active_run().info.run_id}")
+        mlflow.end_run()
+    else:
+        print("\nModel training complete (MLflow tracking disabled)")
 
 
 if __name__ == "__main__":
