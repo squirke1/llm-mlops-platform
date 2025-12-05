@@ -1,0 +1,265 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mlflow-network-policy
+  namespace: mlops-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow-server
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from API pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app: churn-api
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow traffic from same namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: mlops-platform
+      ports:
+        - protocol: TCP
+          port: 5000
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mlflow-postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow HTTPS for external artifact stores (S3, etc.)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-network-policy
+  namespace: mlops-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow-postgres
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow traffic from MLflow server
+    - from:
+        - podSelector:
+            matchLabels:
+              app: mlflow-server
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: mlops-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: churn-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow health checks from monitoring
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow MLflow
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mlflow-server
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow Prometheus push
+    - to:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow HTTPS for external services
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-network-policy
+  namespace: mlops-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow Grafana to query Prometheus
+    - from:
+        - podSelector:
+            matchLabels:
+              app: grafana
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow access from same namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: mlops-platform
+      ports:
+        - protocol: TCP
+          port: 9090
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow scraping targets in mlops-platform namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: mlops-platform
+      ports:
+        - protocol: TCP
+          port: 8000  # API metrics
+        - protocol: TCP
+          port: 5000  # MLflow metrics
+    # Allow Kubernetes API for service discovery
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-network-policy
+  namespace: mlops-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: grafana
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+    # Allow access from same namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: mlops-platform
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow Prometheus queries
+    - to:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow HTTPS for plugins
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: mlops-platform
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

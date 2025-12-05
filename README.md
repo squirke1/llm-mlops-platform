@@ -1,18 +1,33 @@
-# MLOps Platform - Step-by-Step Build 🚀
+# MLOps Platform - Production-Ready Customer Churn Prediction 🚀
 
-> **Learning Project**: Build a production-ready MLOps platform incrementally, one component at a time.
+> **Complete MLOps Platform**: Production-grade machine learning system with experiment tracking, monitoring, and automated operations.
 
-A hands-on guide to building a complete MLOps pipeline for customer churn prediction. Learn modern ML deployment practices by building each component from scratch.
+A comprehensive MLOps platform for customer churn prediction built with modern ML engineering practices. Includes MLflow for experiment tracking, Prometheus/Grafana for monitoring, automated backups, and production-hardened security.
 
-## 🎯 What You'll Build
+## 🎯 What's Included
 
-By the end of this project, you'll have a production-ready ML platform with:
-- ✅ Machine learning model training pipeline
-- ✅ REST API for model serving
-- ✅ Automated testing and CI/CD
-- ✅ Containerization with Docker
-- ✅ Monitoring and observability
-- ✅ Cloud deployment infrastructure
+This production-ready ML platform features:
+- ✅ Machine learning model training pipeline with MLflow tracking
+- ✅ REST API for model serving (FastAPI)
+- ✅ Automated testing and CI/CD (GitHub Actions)
+- ✅ Containerization with Docker and Kubernetes orchestration
+- ✅ Monitoring and observability (Prometheus + Grafana)
+- ✅ MLflow experiment tracking and model registry
+- ✅ Automated backup and disaster recovery
+- ✅ Production security hardening
+- ✅ Cloud deployment infrastructure (Terraform)
+
+## 🏗️ Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed system architecture.
+
+**Key Components**:
+- **API Layer**: FastAPI with prediction endpoints and health checks
+- **ML Platform**: MLflow for experiment tracking and model registry
+- **Storage**: PostgreSQL for metadata, PVCs for artifacts
+- **Monitoring**: Prometheus metrics + Grafana dashboards + Alertmanager
+- **Security**: Kubernetes RBAC, network policies, secrets management
+- **Backup**: Automated daily backups to S3 with restore procedures
 
 ## 📚 Learning Path
 
@@ -82,96 +97,273 @@ By the end of this project, you'll have a production-ready ML platform with:
 **What we'll build**:
 - Unit tests for all components
 - Test fixtures
-- Coverage reporting
-- Integration tests
+## 🚀 Quick Start
 
-**Files to create**: `tests/test_model.py`, `tests/test_api.py`, `tests/conftest.py`
+### Prerequisites
+- Python 3.9+
+- Docker and Docker Compose
+- kubectl (for Kubernetes deployment)
+- AWS CLI (for cloud deployment)
 
----
+### Local Development
 
-### 🐳 Phase 6: Docker
-**What you'll learn**: Containerization, Docker best practices  
-**What we'll build**:
-- Dockerfile for the application
-- Docker Compose for local development
-- Multi-container setup (API + database)
-- Volume management
+```bash
+# Clone repository
+git clone https://github.com/squirke1/llm-mlops-platform.git
+cd llm-mlops-platform
 
-**Files to create**: `Dockerfile`, `docker-compose.yml`, `.dockerignore`
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
 
----
+# Install dependencies
+pip install -r requirements.txt
 
-### 🔄 Phase 7: CI/CD
-**What you'll learn**: GitHub Actions, automation, DevOps  
-**What we'll build**:
-- Automated testing pipeline
-- Code quality checks (linting, formatting)
-- Docker image building
-- Pre-commit hooks
+# Train model
+python src/train.py
 
-**Files to create**: `.github/workflows/ci.yml`, `.pre-commit-config.yaml`
+# Run API locally
+uvicorn api.app:app --reload
 
----
+# Run tests
+pytest tests/ -v
 
-### 📊 Phase 8: MLflow Integration
-**What you'll learn**: Experiment tracking, model registry  
-**What we'll build**:
-- MLflow experiment tracking
-- Model versioning
-- Artifact logging
-- MLflow UI setup
+# Start with Docker Compose
+docker-compose up
+```
 
-**Updates**: Modify `src/train.py` to add MLflow tracking
+### Production Deployment
 
----
-
-### 📈 Phase 9: Monitoring
-**What you'll learn**: Observability, metrics, alerting  
-**What we'll build**:
-- Prometheus metrics
-- Grafana dashboards
-- Custom application metrics
-- Alert rules
-
-**Files to create**: `prometheus.yml`, `grafana/dashboards/`, monitoring configs
-
----
-
-### ☸️ Phase 10: Cloud Deployment
-**What you'll learn**: Kubernetes or AWS ECS, Infrastructure as Code  
-**What we'll build**:
-- Kubernetes manifests OR Terraform configs
-- Load balancer setup
-- Auto-scaling configuration
-- Production deployment
-
-**Files to create**: `k8s/` or `terraform/` directory with configs
-
----
+See [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) for complete production deployment guide.
 
 ## 🛠️ Tech Stack
 
-Will be added incrementally:
-- **Python 3.10+** (Phase 1)
-- **Scikit-learn** (Phase 1)
-- **Pandas & NumPy** (Phase 1)
-- **FastAPI** (Phase 4)
-- **Pytest** (Phase 5)
-- **Docker** (Phase 6)
-- **GitHub Actions** (Phase 7)
-- **MLflow** (Phase 8)
-- **Prometheus/Grafana** (Phase 9)
-- **Kubernetes/Terraform** (Phase 10)
+- **Languages**: Python 3.9
+- **ML Framework**: Scikit-learn 1.3.2
+- **API Framework**: FastAPI 0.104.1
+- **Experiment Tracking**: MLflow 2.9.2
+- **Database**: PostgreSQL 15
+- **Monitoring**: Prometheus 2.45 + Grafana 10.0
+- **Testing**: Pytest 7.4.3
+- **Containerization**: Docker + Docker Compose
+- **Orchestration**: Kubernetes 1.24+
+- **CI/CD**: GitHub Actions
+- **Infrastructure**: Terraform (AWS EKS)
 
-## 🎓 Learning Approach
+## 📊 Development Phases
 
-Each phase will:
-1. **Explain** the concept and why it matters
-2. **Build** the component step by step
-3. **Test** that it works
-4. **Document** what you've learned
+### ✅ Phase 1-6: Core ML Pipeline (Completed)
+- ML model training and evaluation
+- REST API with FastAPI
+- Comprehensive testing
+- Docker containerization
 
-## 📝 Current Status
+### ✅ Phase 7: CI/CD (Completed)
+- Automated testing pipeline
+- Code quality checks (black, isort, flake8)
+- Docker image building
+- Kubernetes manifest validation
+- Terraform validation
+
+### ✅ Phase 8: Monitoring (Completed)
+- Prometheus metrics collection
+- Grafana dashboards
+- Custom application metrics
+- Alert rules
+- API instrumentation
+
+### ✅ Phase 9: MLflow Integration (Completed)
+- Experiment tracking
+- Model registry with versioning
+- Model stage management (Production/Staging)
+- Artifact storage
+- API integration with model registry
+
+### ✅ Phase 10: Production Hardening (Completed)
+- **Secrets Management**: Kubernetes secrets + AWS Secrets Manager integration
+- **Security Hardening**: RBAC, network policies, pod security policies
+- **Backup & DR**: Automated daily backups to S3, restore procedures
+- **Monitoring & Alerts**: Comprehensive alerting rules and runbooks
+- **Documentation**: Production deployment guide, architecture docs, runbooks
+
+## 📁 Project Structure
+
+```
+llm-mlops-platform/
+├── api/                        # FastAPI application
+│   └── app.py                 # API endpoints and model serving
+├── src/                       # Source code
+│   ├── data.py               # Data generation
+│   ├── model.py              # Model training logic
+│   ├── train.py              # Training script with MLflow
+│   └── mlflow_utils.py       # MLflow utilities
+├── tests/                     # Test suite
+│   ├── test_api.py           # API tests
+│   ├── test_model.py         # Model tests
+│   └── conftest.py           # Test fixtures
+├── k8s/                       # Kubernetes manifests
+│   ├── deployment.yaml       # API deployment
+│   ├── service.yaml          # API service
+│   └── namespace.yaml        # Namespace definition
+├── mlflow/                    # MLflow configuration
+│   ├── mlflow-deployment.yaml
+│   ├── postgres-deployment.yaml
+│   └── README.md
+├── monitoring/                # Monitoring setup
+│   ├── prometheus-config.yaml
+│   ├── prometheus-alerts.yaml
+│   ├── grafana-dashboards.yaml
+│   └── README.md
+├── security/                  # Security configurations
+│   ├── rbac.yaml             # Role-based access control
+│   ├── network-policies.yaml # Network segmentation
+│   ├── pod-security-policy.yaml
+│   └── resource-quotas.yaml
+├── secrets/                   # Secrets management
+│   ├── secrets.yaml          # Templates (not actual secrets)
+│   ├── aws-secret-provider.yaml
+│   └── README.md
+├── backup/                    # Backup and DR
+│   ├── backup-cronjobs.yaml  # Automated backup jobs
+│   └── README.md
+├── runbooks/                  # Operational runbooks
+│   └── README.md             # Incident response procedures
+├── docs/                      # Documentation
+│   ├── ARCHITECTURE.md       # System architecture
+│   └── PRODUCTION_DEPLOYMENT.md
+├── .github/workflows/         # CI/CD pipelines
+│   └── ci.yml
+├── Dockerfile                 # Container image
+├── docker-compose.yml         # Local development
+├── requirements.txt           # Python dependencies
+└── README.md                  # This file
+```
+
+## 📖 Documentation
+
+- **[Architecture](docs/ARCHITECTURE.md)**: System design and component details
+- **[Production Deployment](docs/PRODUCTION_DEPLOYMENT.md)**: Complete deployment guide
+- **[Runbooks](runbooks/README.md)**: Operational procedures and troubleshooting
+- **[MLflow Guide](mlflow/README.md)**: Experiment tracking and model registry
+- **[Monitoring Guide](monitoring/README.md)**: Metrics and alerting
+- **[Backup Guide](backup/README.md)**: Backup and disaster recovery
+- **[Secrets Management](secrets/README.md)**: Security and secrets handling
+
+## 🔍 API Endpoints
+
+### Prediction Endpoints
+- `POST /predict` - Single prediction
+- `POST /predict/batch` - Batch predictions
+
+### Health & Monitoring
+- `GET /health` - Health check
+- `GET /metrics` - Prometheus metrics
+
+### API Documentation
+- `GET /docs` - Interactive API documentation (Swagger UI)
+- `GET /redoc` - Alternative API documentation
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=src --cov=api --cov-report=html
+
+# Run specific test file
+pytest tests/test_api.py -v
+
+# Run with specific markers
+pytest tests/ -m "not slow" -v
+```
+
+## 📈 Monitoring
+
+### Metrics Available
+- HTTP request rates and latencies
+- Prediction counts and results
+- Model confidence scores
+- Resource usage (CPU, memory)
+- Business metrics (churn rate)
+
+### Access Monitoring
+
+```bash
+# Port-forward Prometheus
+kubectl port-forward svc/prometheus 9090:9090 -n mlops-platform
+
+# Port-forward Grafana
+kubectl port-forward svc/grafana 3000:3000 -n mlops-platform
+# Default credentials: admin / (see secret)
+```
+
+## 🔐 Security
+
+### Features
+- Kubernetes RBAC for access control
+- Network policies for pod isolation
+- Pod security policies
+- Secrets management (K8s secrets / AWS Secrets Manager)
+- TLS/SSL for all external traffic
+- Resource quotas and limits
+- Automated security scanning in CI
+
+### Best Practices
+- No secrets in Git
+- Principle of least privilege
+- Regular secret rotation
+- Encrypted backups
+- Audit logging enabled
+
+## 💾 Backup & Recovery
+
+### Automated Backups
+- **PostgreSQL**: Daily at 2 AM UTC
+- **MLflow Artifacts**: Daily at 3 AM UTC
+- **Retention**: 7 days local, 90 days in S3
+
+### Disaster Recovery
+- RTO: 4 hours
+- RPO: 24 hours
+- Quarterly DR drills
+- Documented restore procedures
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Workflow
+- All PRs require passing CI checks
+- Code coverage must be maintained (>80%)
+- Follow existing code style (black, isort, flake8)
+- Update documentation as needed
+
+## 📝 Status
+
+**All phases completed!** ✅
+
+This is a fully functional, production-ready MLOps platform with:
+- Complete ML pipeline from training to serving
+- Experiment tracking and model versioning with MLflow
+- Comprehensive monitoring and alerting
+- Production-grade security and backup solutions
+- Full documentation and operational runbooks
+
+Ready for deployment to production environments.
+
+## 📧 Contact
+
+- **Author**: Stephen Quirke
+- **Repository**: [github.com/squirke1/llm-mlops-platform](https://github.com/squirke1/llm-mlops-platform)
+- **Issues**: [GitHub Issues](https://github.com/squirke1/llm-mlops-platform/issues)
+
+## 📄 License
 
 **Phase 0**: Setting up the project foundation
 
