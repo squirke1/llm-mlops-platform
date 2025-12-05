@@ -1,0 +1,247 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-scripts
+  namespace: mlops-platform
+data:
+  backup-postgres.sh: |
+    #!/bin/bash
+    set -e
+    
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    BACKUP_DIR="/backups/postgres"
+    BACKUP_FILE="${BACKUP_DIR}/mlflow_${TIMESTAMP}.sql.gz"
+    
+    echo "Starting PostgreSQL backup at ${TIMESTAMP}"
+    
+    # Create backup directory
+    mkdir -p ${BACKUP_DIR}
+    
+    # Perform backup
+    PGPASSWORD=${POSTGRES_PASSWORD} pg_dump \
+      -h postgres \
+      -U ${POSTGRES_USER} \
+      -d ${POSTGRES_DB} \
+      --format=plain \
+      --no-owner \
+      --no-privileges \
+      | gzip > ${BACKUP_FILE}
+    
+    echo "Backup completed: ${BACKUP_FILE}"
+    
+    # Upload to S3 (if configured)
+    if [ ! -z "${AWS_S3_BUCKET}" ]; then
+      echo "Uploading to S3: s3://${AWS_S3_BUCKET}/backups/postgres/"
+      aws s3 cp ${BACKUP_FILE} s3://${AWS_S3_BUCKET}/backups/postgres/
+      echo "S3 upload completed"
+    fi
+    
+    # Clean up old backups (keep last 7 days)
+    find ${BACKUP_DIR} -name "*.sql.gz" -mtime +7 -delete
+    echo "Cleaned up old backups"
+    
+  restore-postgres.sh: |
+    #!/bin/bash
+    set -e
+    
+    if [ -z "$1" ]; then
+      echo "Usage: restore-postgres.sh <backup-file>"
+      exit 1
+    fi
+    
+    BACKUP_FILE=$1
+    
+    echo "Starting PostgreSQL restore from ${BACKUP_FILE}"
+    
+    # Download from S3 if path starts with s3://
+    if [[ ${BACKUP_FILE} == s3://* ]]; then
+      LOCAL_FILE="/tmp/restore_$(date +%s).sql.gz"
+      echo "Downloading from S3: ${BACKUP_FILE}"
+      aws s3 cp ${BACKUP_FILE} ${LOCAL_FILE}
+      BACKUP_FILE=${LOCAL_FILE}
+    fi
+    
+    # Restore database
+    echo "Restoring database..."
+    gunzip -c ${BACKUP_FILE} | PGPASSWORD=${POSTGRES_PASSWORD} psql \
+      -h postgres \
+      -U ${POSTGRES_USER} \
+      -d ${POSTGRES_DB}
+    
+    echo "Restore completed successfully"
+    
+  backup-mlflow-artifacts.sh: |
+    #!/bin/bash
+    set -e
+    
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    ARTIFACTS_DIR="/mlflow/artifacts"
+    BACKUP_DIR="/backups/artifacts"
+    BACKUP_FILE="${BACKUP_DIR}/artifacts_${TIMESTAMP}.tar.gz"
+    
+    echo "Starting MLflow artifacts backup at ${TIMESTAMP}"
+    
+    # Create backup directory
+    mkdir -p ${BACKUP_DIR}
+    
+    # Create tarball of artifacts
+    tar -czf ${BACKUP_FILE} -C ${ARTIFACTS_DIR} .
+    
+    echo "Backup completed: ${BACKUP_FILE}"
+    
+    # Upload to S3 (if configured)
+    if [ ! -z "${AWS_S3_BUCKET}" ]; then
+      echo "Uploading to S3: s3://${AWS_S3_BUCKET}/backups/artifacts/"
+      aws s3 cp ${BACKUP_FILE} s3://${AWS_S3_BUCKET}/backups/artifacts/
+      echo "S3 upload completed"
+    fi
+    
+    # Clean up old backups (keep last 7 days)
+    find ${BACKUP_DIR} -name "*.tar.gz" -mtime +7 -delete
+    echo "Cleaned up old backups"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: mlops-platform
+spec:
+  # Run daily at 2 AM
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: backup-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            command:
+            - /bin/bash
+            - /scripts/backup-postgres.sh
+            env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-db
+            - name: AWS_S3_BUCKET
+              value: "mlops-platform-backups"  # Change to your bucket
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+            - name: backup-storage
+              mountPath: /backups
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: backup-scripts
+              defaultMode: 0755
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mlflow-artifacts-backup
+  namespace: mlops-platform
+spec:
+  # Run daily at 3 AM
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: backup-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: alpine:3.18
+            command:
+            - /bin/sh
+            - /scripts/backup-mlflow-artifacts.sh
+            env:
+            - name: AWS_S3_BUCKET
+              value: "mlops-platform-backups"  # Change to your bucket
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+            - name: mlflow-artifacts
+              mountPath: /mlflow/artifacts
+              readOnly: true
+            - name: backup-storage
+              mountPath: /backups
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: backup-scripts
+              defaultMode: 0755
+          - name: mlflow-artifacts
+            persistentVolumeClaim:
+              claimName: mlflow-artifacts-pvc
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-pvc
+  namespace: mlops-platform
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backup-sa
+  namespace: mlops-platform
+  annotations:
+    # For EKS with IAM roles for S3 access
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/mlops-backup-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: backup-role
+  namespace: mlops-platform
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames: ["postgres-secrets"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backup-rolebinding
+  namespace: mlops-platform
+subjects:
+  - kind: ServiceAccount
+    name: backup-sa
+    namespace: mlops-platform
+roleRef:
+  kind: Role
+  name: backup-role
+  apiGroup: rbac.authorization.k8s.io

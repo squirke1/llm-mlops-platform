@@ -1,0 +1,43 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mlflow-server-pdb
+  namespace: mlops-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: mlflow-server
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: churn-api-pdb
+  namespace: mlops-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: churn-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: prometheus-pdb
+  namespace: mlops-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: prometheus
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: grafana-pdb
+  namespace: mlops-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: grafana

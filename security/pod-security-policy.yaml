@@ -1,0 +1,83 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: mlops-platform-restricted
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
+    apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
+spec:
+  # Prevent privileged containers
+  privileged: false
+  
+  # Don't allow privilege escalation
+  allowPrivilegeEscalation: false
+  
+  # Require specific capabilities to be dropped
+  requiredDropCapabilities:
+    - ALL
+  
+  # Allow only minimal capabilities
+  allowedCapabilities:
+    - NET_BIND_SERVICE
+  
+  # Volumes allowed
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  
+  # Don't allow host networking
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  
+  # Run as non-root user
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  
+  # Require read-only root filesystem
+  readOnlyRootFilesystem: true
+  
+  # SELinux
+  seLinux:
+    rule: 'RunAsAny'
+  
+  # Supplemental groups
+  supplementalGroups:
+    rule: 'RunAsAny'
+  
+  # FSGroup
+  fsGroup:
+    rule: 'RunAsAny'
+---
+# Role to use the PSP
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mlops-psp-role
+  namespace: mlops-platform
+rules:
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames: ['mlops-platform-restricted']
+---
+# RoleBinding for all service accounts in namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mlops-psp-rolebinding
+  namespace: mlops-platform
+roleRef:
+  kind: Role
+  name: mlops-psp-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: system:serviceaccounts:mlops-platform
+    apiGroup: rbac.authorization.k8s.io
