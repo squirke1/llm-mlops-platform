@@ -74,3 +74,160 @@ data:
         annotations:
           summary: "Churn API pod is down"
           description: "Cannot scrape metrics from churn-api"
+    
+    - name: mlflow_alerts
+      interval: 30s
+      rules:
+      # MLflow server down
+      - alert: MLflowServerDown
+        expr: |
+          up{job="mlflow-server"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MLflow server is down"
+          description: "MLflow tracking server is unreachable"
+      
+      # PostgreSQL down
+      - alert: PostgreSQLDown
+        expr: |
+          up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "MLflow backend database is unreachable"
+      
+      # High database connections
+      - alert: HighDatabaseConnections
+        expr: |
+          pg_stat_database_numbackends{datname="mlflow"} > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection count"
+          description: "Database has {{ $value }} connections (threshold: 80)"
+      
+      # Disk space low (artifacts)
+      - alert: ArtifactsDiskSpaceLow
+        expr: |
+          (kubelet_volume_stats_available_bytes{persistentvolumeclaim="mlflow-artifacts-pvc"} / 
+           kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="mlflow-artifacts-pvc"}) < 0.15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MLflow artifacts disk space low"
+          description: "Only {{ $value | humanizePercentage }} space remaining"
+      
+      # Disk space critical (artifacts)
+      - alert: ArtifactsDiskSpaceCritical
+        expr: |
+          (kubelet_volume_stats_available_bytes{persistentvolumeclaim="mlflow-artifacts-pvc"} / 
+           kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="mlflow-artifacts-pvc"}) < 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MLflow artifacts disk space critical"
+          description: "Only {{ $value | humanizePercentage }} space remaining"
+    
+    - name: backup_alerts
+      interval: 1h
+      rules:
+      # Backup job failed
+      - alert: BackupJobFailed
+        expr: |
+          kube_job_status_failed{namespace="mlops-platform",job_name=~".*backup.*"} > 0
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backup job failed"
+          description: "Backup job {{ $labels.job_name }} has failed"
+      
+      # Backup job missing
+      - alert: BackupJobMissing
+        expr: |
+          (time() - kube_job_status_completion_time{namespace="mlops-platform",job_name=~".*backup.*"}) > 86400 * 2
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backup job hasn't run"
+          description: "Backup job {{ $labels.job_name }} hasn't completed in 48 hours"
+      
+      # Backup disk space low
+      - alert: BackupDiskSpaceLow
+        expr: |
+          (kubelet_volume_stats_available_bytes{persistentvolumeclaim="backup-pvc"} / 
+           kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="backup-pvc"}) < 0.2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backup disk space low"
+          description: "Only {{ $value | humanizePercentage }} space remaining on backup volume"
+    
+    - name: resource_alerts
+      interval: 30s
+      rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: |
+          rate(container_cpu_usage_seconds_total{namespace="mlops-platform"}[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "Container {{ $labels.container }} is using {{ $value | humanizePercentage }} CPU"
+      
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes{namespace="mlops-platform"} / 
+           container_spec_memory_limit_bytes{namespace="mlops-platform"}) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Container {{ $labels.container }} is using {{ $value | humanizePercentage }} memory"
+      
+      # Pod restart loops
+      - alert: PodRestartLoop
+        expr: |
+          rate(kube_pod_container_status_restarts_total{namespace="mlops-platform"}[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod is restarting frequently"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in 15 minutes"
+      
+      # Pod not ready
+      - alert: PodNotReady
+        expr: |
+          kube_pod_status_phase{namespace="mlops-platform",phase!="Running"} == 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod is not ready"
+          description: "Pod {{ $labels.pod }} has been in {{ $labels.phase }} state for > 10 minutes"
+      
+      # Persistent volume filling up
+      - alert: PersistentVolumeFillingUp
+        expr: |
+          (kubelet_volume_stats_available_bytes{namespace="mlops-platform"} / 
+           kubelet_volume_stats_capacity_bytes{namespace="mlops-platform"}) < 0.1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Persistent volume almost full"
+          description: "PVC {{ $labels.persistentvolumeclaim }} has only {{ $value | humanizePercentage }} space left"
