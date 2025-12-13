@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ab-testing-config
+  namespace: mlops-platform
+data:
+  # Enable or disable A/B testing
+  AB_TESTING_ENABLED: "false"  # Set to "true" to enable
+  
+  # Routing strategy: random, hash, or sticky
+  # - random: Random distribution based on traffic percentage
+  # - hash: Consistent routing based on user_id hash
+  # - sticky: Session-based routing using session_id
+  AB_ROUTING_STRATEGY: "random"
+  
+  # Traffic configuration (variant_name:percentage,variant_name:percentage)
+  # Must sum to 100
+  # Example: "production:90,staging:10" for 90% production, 10% staging
+  AB_TRAFFIC_CONFIG: "production:100"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ab-testing-examples
+  namespace: mlops-platform
+data:
+  canary-5percent.conf: |
+    # Canary deployment with 5% traffic to new model
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=random
+    AB_TRAFFIC_CONFIG=production:95,staging:5
+  
+  split-test-50-50.conf: |
+    # 50/50 split test
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=hash
+    AB_TRAFFIC_CONFIG=production:50,staging:50
+  
+  multi-variant.conf: |
+    # Multi-variant test with 3 models
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=random
+    AB_TRAFFIC_CONFIG=production:70,variant_a:15,variant_b:15
+  
+  gradual-rollout-phase1.conf: |
+    # Phase 1: 5% new model
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=random
+    AB_TRAFFIC_CONFIG=production:95,staging:5
+  
+  gradual-rollout-phase2.conf: |
+    # Phase 2: 20% new model
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=random
+    AB_TRAFFIC_CONFIG=production:80,staging:20
+  
+  gradual-rollout-phase3.conf: |
+    # Phase 3: 50% new model
+    AB_TESTING_ENABLED=true
+    AB_ROUTING_STRATEGY=hash
+    AB_TRAFFIC_CONFIG=production:50,staging:50
