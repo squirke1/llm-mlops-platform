@@ -36,6 +36,25 @@ spec:
             configMapKeyRef:
               name: churn-model-config
               key: LOG_LEVEL
+        # A/B Testing Configuration
+        - name: AB_TESTING_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: ab-testing-config
+              key: AB_TESTING_ENABLED
+              optional: true
+        - name: AB_ROUTING_STRATEGY
+          valueFrom:
+            configMapKeyRef:
+              name: ab-testing-config
+              key: AB_ROUTING_STRATEGY
+              optional: true
+        - name: AB_TRAFFIC_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: ab-testing-config
+              key: AB_TRAFFIC_CONFIG
+              optional: true
         resources:
           requests:
             memory: "256Mi"

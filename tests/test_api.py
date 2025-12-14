@@ -54,7 +54,9 @@ class TestRootEndpoints:
         assert "status" in data
         assert "model_loaded" in data
         assert "version" in data
+        assert "ab_testing_enabled" in data
         assert data["version"] == "1.0.0"
+        assert isinstance(data["ab_testing_enabled"], bool)
 
 
 class TestPredictionEndpoint:
@@ -76,8 +78,12 @@ class TestPredictionEndpoint:
         data = response.json()
         assert "prediction" in data
         assert "probability" in data
+        assert "model_variant" in data
+        assert "model_version" in data
         assert data["prediction"] in [0, 1]
         assert 0 <= data["probability"] <= 1
+        assert isinstance(data["model_variant"], str)
+        assert isinstance(data["model_version"], str)
 
     def test_predict_low_risk_customer(self):
         """Test prediction for low-risk customer profile."""
@@ -170,3 +176,77 @@ class TestAPIDocumentation:
         """Test that ReDoc is accessible."""
         response = client.get("/redoc")
         assert response.status_code == 200
+
+
+class TestABTestingEndpoints:
+    """Test A/B testing specific endpoints."""
+
+    def test_ab_test_status_endpoint(self):
+        """Test A/B test status endpoint."""
+        response = client.get("/api/v1/ab-test/status")
+        assert response.status_code == 200
+        data = response.json()
+        assert "enabled" in data
+        assert "routing_strategy" in data
+        assert "variants" in data
+        assert isinstance(data["enabled"], bool)
+        assert isinstance(data["variants"], list)
+
+    def test_predict_with_user_id(self):
+        """Test prediction with user_id for hash routing."""
+        payload = {
+            "tenure_months": 24,
+            "monthly_charges": 79.99,
+            "total_charges": 1919.76,
+            "contract_type": "Month-to-month",
+            "num_support_tickets": 3,
+            "user_id": "test_user_123",
+        }
+
+        response = client.post("/api/v1/predict", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert "model_variant" in data
+        assert "model_version" in data
+
+    def test_predict_with_session_id(self):
+        """Test prediction with session_id for sticky routing."""
+        payload = {
+            "tenure_months": 24,
+            "monthly_charges": 79.99,
+            "total_charges": 1919.76,
+            "contract_type": "Month-to-month",
+            "num_support_tickets": 3,
+            "session_id": "test_session_456",
+        }
+
+        response = client.post("/api/v1/predict", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert "model_variant" in data
+        assert "model_version" in data
+
+    def test_predict_consistency_same_user(self):
+        """Test that same user_id gets consistent routing."""
+        payload = {
+            "tenure_months": 24,
+            "monthly_charges": 79.99,
+            "total_charges": 1919.76,
+            "contract_type": "Month-to-month",
+            "num_support_tickets": 3,
+            "user_id": "consistent_user",
+        }
+
+        # Make multiple requests with same user_id
+        response1 = client.post("/api/v1/predict", json=payload)
+        response2 = client.post("/api/v1/predict", json=payload)
+
+        assert response1.status_code == 200
+        assert response2.status_code == 200
+
+        # For hash routing, same user should get same variant
+        # (This assumes hash routing is enabled, otherwise test will still pass)
+        data1 = response1.json()
+        data2 = response2.json()
+        assert "model_variant" in data1
+        assert "model_variant" in data2

@@ -40,9 +40,18 @@ class ChurnPredictionResponse(BaseModel):
 
     prediction: int = Field(..., description="Churn prediction (0=No, 1=Yes)")
     probability: float = Field(..., ge=0, le=1, description="Churn probability")
+    model_variant: str = Field(default="default", description="Model variant used for prediction")
+    model_version: str = Field(default="unknown", description="Model version")
 
     class Config:
-        json_schema_extra = {"example": {"prediction": 1, "probability": 0.73}}
+        json_schema_extra = {
+            "example": {
+                "prediction": 1,
+                "probability": 0.73,
+                "model_variant": "production",
+                "model_version": "production",
+            }
+        }
 
 
 class HealthResponse(BaseModel):
@@ -51,8 +60,14 @@ class HealthResponse(BaseModel):
     status: str = Field(..., description="Service status")
     model_loaded: bool = Field(..., description="Whether model is loaded")
     version: str = Field(..., description="API version")
+    ab_testing_enabled: bool = Field(default=False, description="Whether A/B testing is active")
 
     class Config:
         json_schema_extra = {
-            "example": {"status": "healthy", "model_loaded": True, "version": "1.0.0"}
+            "example": {
+                "status": "healthy",
+                "model_loaded": True,
+                "version": "1.0.0",
+                "ab_testing_enabled": True,
+            }
         }

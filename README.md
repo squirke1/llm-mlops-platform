@@ -16,6 +16,7 @@ This production-ready ML platform features:
 - ✅ Automated backup and disaster recovery
 - ✅ Production security hardening
 - ✅ Cloud deployment infrastructure (Terraform)
+- ✅ Model A/B testing with traffic routing and metrics
 
 ## 🏗️ Architecture
 
@@ -186,12 +187,23 @@ See [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) for complete 
 - **Monitoring & Alerts**: Comprehensive alerting rules and runbooks
 - **Documentation**: Production deployment guide, architecture docs, runbooks
 
+### ✅ Phase 11: Model A/B Testing (Completed)
+- **Variant Management**: Support for multiple model versions in production
+- **Routing Strategies**: Random, hash-based (user_id), and sticky (session_id)
+- **Traffic Control**: Dynamic traffic splitting between model variants
+- **Metrics Tracking**: Per-variant performance metrics (latency, errors, requests)
+- **Gradual Rollout**: Canary deployments and progressive traffic migration
+- **Grafana Dashboard**: Visualizations for A/B test comparison
+- **Documentation**: Complete A/B testing guide with examples
+
 ## 📁 Project Structure
 
 ```
 llm-mlops-platform/
 ├── api/                        # FastAPI application
-│   └── app.py                 # API endpoints and model serving
+│   ├── app.py                 # API endpoints and model serving
+│   ├── schemas.py             # Pydantic schemas
+│   └── ab_testing.py          # A/B testing logic
 ├── src/                       # Source code
 │   ├── data.py               # Data generation
 │   ├── model.py              # Model training logic
@@ -200,11 +212,13 @@ llm-mlops-platform/
 ├── tests/                     # Test suite
 │   ├── test_api.py           # API tests
 │   ├── test_model.py         # Model tests
+│   ├── test_ab_testing.py    # A/B testing tests
 │   └── conftest.py           # Test fixtures
 ├── k8s/                       # Kubernetes manifests
 │   ├── deployment.yaml       # API deployment
 │   ├── service.yaml          # API service
-│   └── namespace.yaml        # Namespace definition
+│   ├── namespace.yaml        # Namespace definition
+│   └── ab-testing-config.yaml # A/B testing configuration
 ├── mlflow/                    # MLflow configuration
 │   ├── mlflow-deployment.yaml
 │   ├── postgres-deployment.yaml
@@ -213,6 +227,8 @@ llm-mlops-platform/
 │   ├── prometheus-config.yaml
 │   ├── prometheus-alerts.yaml
 │   ├── grafana-dashboards.yaml
+│   ├── dashboards/
+│   │   └── ab-testing-dashboard.json
 │   └── README.md
 ├── security/                  # Security configurations
 │   ├── rbac.yaml             # Role-based access control
@@ -230,7 +246,8 @@ llm-mlops-platform/
 │   └── README.md             # Incident response procedures
 ├── docs/                      # Documentation
 │   ├── ARCHITECTURE.md       # System architecture
-│   └── PRODUCTION_DEPLOYMENT.md
+│   ├── PRODUCTION_DEPLOYMENT.md
+│   └── AB_TESTING.md         # A/B testing guide
 ├── .github/workflows/         # CI/CD pipelines
 │   └── ci.yml
 ├── Dockerfile                 # Container image
@@ -243,6 +260,7 @@ llm-mlops-platform/
 
 - **[Architecture](docs/ARCHITECTURE.md)**: System design and component details
 - **[Production Deployment](docs/PRODUCTION_DEPLOYMENT.md)**: Complete deployment guide
+- **[A/B Testing](docs/AB_TESTING.md)**: Model variant testing and gradual rollout
 - **[Runbooks](runbooks/README.md)**: Operational procedures and troubleshooting
 - **[MLflow Guide](mlflow/README.md)**: Experiment tracking and model registry
 - **[Monitoring Guide](monitoring/README.md)**: Metrics and alerting
@@ -252,8 +270,11 @@ llm-mlops-platform/
 ## 🔍 API Endpoints
 
 ### Prediction Endpoints
-- `POST /predict` - Single prediction
+- `POST /api/v1/predict` - Single prediction (supports user_id and session_id for A/B testing)
 - `POST /predict/batch` - Batch predictions
+
+### A/B Testing
+- `GET /api/v1/ab-test/status` - Get A/B test configuration and variant stats
 
 ### Health & Monitoring
 - `GET /health` - Health check
@@ -285,6 +306,7 @@ pytest tests/ -m "not slow" -v
 - HTTP request rates and latencies
 - Prediction counts and results
 - Model confidence scores
+- A/B test variant performance (per-variant requests, latency, errors)
 - Resource usage (CPU, memory)
 - Business metrics (churn rate)
 
