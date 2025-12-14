@@ -293,9 +293,7 @@ async def predict_churn(
 
         # Track variant-specific errors
         if variant:
-            variant_errors.labels(
-                variant_name=variant_name, variant_version=variant_version
-            ).inc()
+            variant_errors.labels(variant_name=variant_name, variant_version=variant_version).inc()
 
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
