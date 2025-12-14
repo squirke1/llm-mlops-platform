@@ -30,9 +30,7 @@ except ValueError:
     from prometheus_client import REGISTRY
 
     variant_requests = REGISTRY._collector_to_names.get("ab_test_requests_total")
-    variant_latency = REGISTRY._collector_to_names.get(
-        "ab_test_prediction_duration_seconds"
-    )
+    variant_latency = REGISTRY._collector_to_names.get("ab_test_prediction_duration_seconds")
     variant_errors = REGISTRY._collector_to_names.get("ab_test_errors_total")
 
 
@@ -106,7 +104,8 @@ class ABTestManager:
                 - sticky: Session-based routing (requires session ID)
         """
         if strategy not in ["random", "hash", "sticky"]:
-            raise ValueError("strategy must be 'random', 'hash', or 'sticky'")
+            print(f"Invalid strategy '{strategy}', defaulting to 'random'")
+            strategy = "random"
         self.routing_strategy = strategy
         print(f"Routing strategy set to: {strategy}")
 
