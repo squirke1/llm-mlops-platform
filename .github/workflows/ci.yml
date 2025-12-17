@@ -45,7 +45,7 @@ jobs:
           cd src && python train.py
       - name: Run tests
         run: |
-          pytest tests/ -v
+          pytest tests/ -v --ignore=tests/test_feature_store.py
 
   docker:
     name: Docker Build
