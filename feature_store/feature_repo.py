@@ -11,7 +11,6 @@ from feast import Entity, Feature, FeatureView, FileSource, ValueType
 from feast.data_source import RequestSource
 from feast.feature_service import FeatureService
 from feast.on_demand_feature_view import on_demand_feature_view
-from feast.types import Float32, Int32, String
 
 # Define Customer entity
 customer = Entity(

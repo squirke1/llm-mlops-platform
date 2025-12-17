@@ -5,12 +5,7 @@ This script sets up the feature store registry and materializes features
 to the online store for serving.
 """
 
-import sys
 from datetime import datetime, timedelta
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from feast import FeatureStore
 
@@ -120,19 +115,21 @@ def main():
 
     # Step 1: Initialize feature store
     try:
-        store = initialize_feature_store(repo_path)
+        initialize_feature_store(repo_path)
     except Exception as e:
         print(f"\nFailed to initialize feature store: {e}")
         print("Please ensure feature data exists in the data/ directory")
         print("Run: python feature_store/generate_features.py")
+        import sys
         sys.exit(1)
 
     # Step 2: Materialize features
     try:
         materialize_features(repo_path, days_back=7)
     except Exception as e:
-        print(f"\nFailed to materialize features: {e}")
+        print(f"\\nFailed to materialize features: {e}")
         print("Please ensure feature data exists and is properly formatted")
+        import sys
         sys.exit(1)
 
     print("\n" + "=" * 60)

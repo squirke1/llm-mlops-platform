@@ -5,14 +5,12 @@ This module provides helper functions for interacting with the Feast feature sto
 including feature retrieval, materialization, and validation.
 """
 
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import pandas as pd
 from feast import FeatureStore
-from feast.infra.online_stores.helpers import get_online_store_class
 
 
 class FeatureStoreClient:
