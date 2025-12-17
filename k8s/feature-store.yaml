@@ -1,0 +1,123 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-store-config
+  namespace: mlops-platform
+data:
+  feature_store.yaml: |
+    project: churn_prediction
+    registry: s3://mlops-feature-store/registry.db
+    provider: aws
+    online_store:
+        type: dynamodb
+        region: us-west-2
+    offline_store:
+        type: file
+        path: s3://mlops-feature-store/offline
+    entity_key_serialization_version: 2
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: feature-store-materialization
+  namespace: mlops-platform
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: feast-materialize
+            image: churn-prediction-api:latest
+            command:
+            - python
+            - -m
+            - feature_store.setup_feature_store
+            env:
+            - name: AWS_DEFAULT_REGION
+              value: "us-west-2"
+            - name: FEAST_USAGE
+              value: "false"
+            volumeMounts:
+            - name: feature-store-config
+              mountPath: /app/feature_store
+              readOnly: true
+          volumes:
+          - name: feature-store-config
+            configMap:
+              name: feature-store-config
+          serviceAccountName: mlops-service-account
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feature-store-registry
+  namespace: mlops-platform
+  labels:
+    app: feature-store-registry
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6566
+    targetPort: 6566
+    protocol: TCP
+    name: registry
+  selector:
+    app: feature-store-registry
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feature-store-registry
+  namespace: mlops-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: feature-store-registry
+  template:
+    metadata:
+      labels:
+        app: feature-store-registry
+    spec:
+      containers:
+      - name: feast-registry-server
+        image: feastdev/feature-server:latest
+        ports:
+        - containerPort: 6566
+        env:
+        - name: FEAST_USAGE
+          value: "false"
+        volumeMounts:
+        - name: feature-store-config
+          mountPath: /feature_repo
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 6566
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 6566
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: feature-store-config
+        configMap:
+          name: feature-store-config
