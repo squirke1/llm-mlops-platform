@@ -7,7 +7,7 @@ including feature retrieval, materialization, and validation.
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 from feast import FeatureStore
@@ -33,7 +33,7 @@ class FeatureStoreClient:
     def get_online_features(
         self,
         feature_service: str,
-        entity_rows: List[Dict[str, any]],
+        entity_rows: List[Dict[str, Any]],
     ) -> pd.DataFrame:
         """
         Retrieve features from the online store for real-time serving.
@@ -159,7 +159,7 @@ class FeatureStoreClient:
             print(f"Error listing feature services: {e}")
             raise
 
-    def validate_features(self, entity_rows: List[Dict[str, any]]) -> bool:
+    def validate_features(self, entity_rows: List[Dict[str, Any]]) -> bool:
         """
         Validate that features can be retrieved for given entities.
 
@@ -209,7 +209,7 @@ def get_feature_store_client(repo_path: Optional[str] = None) -> FeatureStoreCli
     return _feature_store_client
 
 
-def get_features_for_prediction(customer_id: str) -> Dict[str, any]:
+def get_features_for_prediction(customer_id: str) -> Dict[str, Any]:
     """
     Get features for a single customer prediction.
 
