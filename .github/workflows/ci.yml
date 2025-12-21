@@ -23,9 +23,9 @@ jobs:
           pip install black==23.12.1 flake8==7.0.0 isort==5.13.2 mypy==1.8.0
       - name: Run linters
         run: |
-          black --check src/ api/ tests/
-          isort --check-only src/ api/ tests/
-          flake8 src/ api/ tests/
+          black --check src/ api/ feature_store/ tests/
+          isort --check-only src/ api/ feature_store/ tests/
+          flake8 src/ api/ feature_store/ tests/
 
   test:
     name: Run Tests
