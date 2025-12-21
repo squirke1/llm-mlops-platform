@@ -31,7 +31,7 @@ def setup_model():
     app_module.model = None
 
 
-client = TestClient(app)
+client = TestClient(app=app)
 
 
 class TestRootEndpoints:
