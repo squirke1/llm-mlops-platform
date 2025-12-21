@@ -1,6 +1,6 @@
 """Pydantic schemas for request/response validation."""
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 
 
 class ChurnPredictionRequest(BaseModel):
@@ -14,8 +14,7 @@ class ChurnPredictionRequest(BaseModel):
     )
     num_support_tickets: int = Field(..., ge=0, le=50, description="Number of support tickets")
 
-    @field_validator("contract_type")
-    @classmethod
+    @validator("contract_type")
     def validate_contract_type(cls, v):
         """Validate contract type is one of allowed values."""
         allowed = ["Month-to-month", "One year", "Two year"]
@@ -24,7 +23,7 @@ class ChurnPredictionRequest(BaseModel):
         return v
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "tenure_months": 24,
                 "monthly_charges": 79.99,
@@ -44,7 +43,7 @@ class ChurnPredictionResponse(BaseModel):
     model_version: str = Field(default="unknown", description="Model version")
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "prediction": 1,
                 "probability": 0.73,
@@ -66,7 +65,7 @@ class HealthResponse(BaseModel):
     )
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "status": "healthy",
                 "model_loaded": True,
@@ -83,7 +82,7 @@ class CustomerIdRequest(BaseModel):
     customer_id: str = Field(..., description="Customer ID for feature retrieval")
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "customer_id": "CUST_000123",
             }
@@ -104,7 +103,7 @@ class FeatureStoreHealthResponse(BaseModel):
     error: str = Field(default=None, description="Error message if unhealthy")
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "available": True,
                 "online_store_healthy": True,
