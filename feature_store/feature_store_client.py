@@ -7,7 +7,7 @@ including feature retrieval, materialization, and validation.
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from feast import FeatureStore
