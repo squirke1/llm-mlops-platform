@@ -123,7 +123,7 @@ class ABTestManager:
             Selected ModelVariant or None if no variants available
         """
         if not self.variants:
-            return None
+            raise ValueError("No variants available for selection")
 
         # Normalize traffic percentages
         total_traffic = sum(v.traffic_percentage for v in self.variants.values())
@@ -201,9 +201,11 @@ class ABTestManager:
             traffic_config: Dict mapping variant names to traffic percentages
                 Example: {'model_v1': 90, 'model_v2': 10}
         """
-        total = sum(traffic_config.values())
-        if abs(total - 100) > 0.01:  # Allow small floating point errors
-            raise ValueError(f"Traffic percentages must sum to 100, got {total}")
+        # Only validate sum if updating all variants
+        if len(traffic_config) == len(self.variants):
+            total = sum(traffic_config.values())
+            if abs(total - 100) > 0.01:  # Allow small floating point errors
+                raise ValueError(f"Traffic percentages must sum to 100, got {total}")
 
         for name, percentage in traffic_config.items():
             if name in self.variants:
@@ -212,13 +214,15 @@ class ABTestManager:
             else:
                 print(f"Warning: Variant '{name}' not found")
 
-    def enable_test(self, test_name: str):
+    def enable_test(self, test_name: str = "default"):
         """Enable an A/B test."""
+        self.enabled = True
         self.active_test = test_name
         print(f"Enabled A/B test: {test_name}")
 
     def disable_test(self):
         """Disable the active A/B test."""
+        self.enabled = False
         if self.active_test:
             print(f"Disabled A/B test: {self.active_test}")
             self.active_test = None
@@ -232,18 +236,22 @@ class ABTestManager:
 ab_test_manager = ABTestManager()
 
 
-def configure_ab_test_from_env():
+def configure_ab_test_from_env(manager: ABTestManager = None):
     """Configure A/B testing from environment variables."""
+    if manager is None:
+        manager = ab_test_manager
+    
     # Check if A/B testing is enabled
     ab_testing_enabled = os.getenv("AB_TESTING_ENABLED", "false").lower() == "true"
 
-    if not ab_testing_enabled:
-        print("A/B testing is disabled")
-        return
+    if ab_testing_enabled:
+        manager.enable_test("env_configured")
+    else:
+        manager.disable_test()
 
     # Get routing strategy
     strategy = os.getenv("AB_ROUTING_STRATEGY", "random")
-    ab_test_manager.set_routing_strategy(strategy)
+    manager.set_routing_strategy(strategy)
 
     # Get traffic split configuration
     # Format: VARIANT_NAME:PERCENTAGE,VARIANT_NAME:PERCENTAGE
@@ -257,6 +265,15 @@ def configure_ab_test_from_env():
                 name, percentage = pair.split(":")
                 traffic_config[name.strip()] = float(percentage.strip())
 
+            # Update traffic split for existing variants
+            if len(traffic_config) == len(manager.variants):
+                manager.update_traffic_split(traffic_config)
+            else:
+                # Just update the percentages directly if not all variants
+                for name, percentage in traffic_config.items():
+                    if name in manager.variants:
+                        manager.variants[name].traffic_percentage = percentage
+            
             print(f"Configured A/B test traffic split: {traffic_config}")
             return traffic_config
         except Exception as e:
