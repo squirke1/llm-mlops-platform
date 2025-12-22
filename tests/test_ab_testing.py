@@ -167,7 +167,7 @@ class TestVariantSelection:
 
         assert variant.name == "production"
 
-    @patch("random.random")
+    @patch("random.uniform")
     def test_select_variant_random_strategy(self, mock_random, ab_test_manager, mock_model):
         """Test variant selection with random routing strategy."""
         ab_test_manager.add_variant("production", mock_model, 70.0)
@@ -175,13 +175,13 @@ class TestVariantSelection:
         ab_test_manager.set_routing_strategy("random")
         ab_test_manager.enable_test()
 
-        # Mock random to return 0.5 (should select production with 70% traffic)
-        mock_random.return_value = 0.5
+        # Mock random to return 50 (should select production with 70% traffic)
+        mock_random.return_value = 50
         variant = ab_test_manager.select_variant()
         assert variant.name == "production"
 
-        # Mock random to return 0.8 (should select staging with 30% traffic)
-        mock_random.return_value = 0.8
+        # Mock random to return 80 (should select staging with 30% traffic)
+        mock_random.return_value = 80
         variant = ab_test_manager.select_variant()
         assert variant.name == "staging"
 
@@ -335,8 +335,8 @@ class TestEdgeCases:
 
     def test_empty_variants(self, ab_test_manager):
         """Test behavior with no variants."""
-        with pytest.raises(ValueError):
-            ab_test_manager.select_variant()
+        variant = ab_test_manager.select_variant()
+        assert variant is None
 
     def test_zero_traffic_variants(self, ab_test_manager, mock_model):
         """Test behavior when all variants have zero traffic."""

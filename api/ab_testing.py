@@ -123,12 +123,13 @@ class ABTestManager:
             Selected ModelVariant or None if no variants available
         """
         if not self.variants:
-            raise ValueError("No variants available for selection")
+            return None
 
         # Normalize traffic percentages
         total_traffic = sum(v.traffic_percentage for v in self.variants.values())
         if total_traffic == 0:
-            return None
+            # Return first variant if all have zero traffic
+            return list(self.variants.values())[0]
 
         # Random routing
         if self.routing_strategy == "random":
@@ -143,8 +144,8 @@ class ABTestManager:
         # Hash-based routing
         elif self.routing_strategy == "hash":
             if not user_id:
-                # Fallback to random if no user_id
-                return self.select_variant()
+                # Fallback to first variant if no user_id
+                return list(self.variants.values())[0]
 
             # Hash user_id to get consistent routing
             hash_value = int(hashlib.md5(user_id.encode()).hexdigest(), 16)
@@ -160,8 +161,8 @@ class ABTestManager:
         # Sticky routing (session-based)
         elif self.routing_strategy == "sticky":
             if not session_id:
-                # Fallback to random if no session_id
-                return self.select_variant()
+                # Fallback to first variant if no session_id
+                return list(self.variants.values())[0]
 
             # Hash session_id for consistent routing within session
             hash_value = int(hashlib.md5(session_id.encode()).hexdigest(), 16)
@@ -201,12 +202,6 @@ class ABTestManager:
             traffic_config: Dict mapping variant names to traffic percentages
                 Example: {'model_v1': 90, 'model_v2': 10}
         """
-        # Only validate sum if updating all variants
-        if len(traffic_config) == len(self.variants):
-            total = sum(traffic_config.values())
-            if abs(total - 100) > 0.01:  # Allow small floating point errors
-                raise ValueError(f"Traffic percentages must sum to 100, got {total}")
-
         for name, percentage in traffic_config.items():
             if name in self.variants:
                 self.variants[name].traffic_percentage = percentage
@@ -240,7 +235,7 @@ def configure_ab_test_from_env(manager: ABTestManager = None):
     """Configure A/B testing from environment variables."""
     if manager is None:
         manager = ab_test_manager
-    
+
     # Check if A/B testing is enabled
     ab_testing_enabled = os.getenv("AB_TESTING_ENABLED", "false").lower() == "true"
 
@@ -273,7 +268,7 @@ def configure_ab_test_from_env(manager: ABTestManager = None):
                 for name, percentage in traffic_config.items():
                     if name in manager.variants:
                         manager.variants[name].traffic_percentage = percentage
-            
+
             print(f"Configured A/B test traffic split: {traffic_config}")
             return traffic_config
         except Exception as e:
