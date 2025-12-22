@@ -23,8 +23,8 @@ class ChurnPredictionRequest(BaseModel):
             raise ValueError(f"contract_type must be one of {allowed}")
         return v
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "tenure_months": 24,
                 "monthly_charges": 79.99,
@@ -33,6 +33,7 @@ class ChurnPredictionRequest(BaseModel):
                 "num_support_tickets": 3,
             }
         }
+    }
 
 
 class ChurnPredictionResponse(BaseModel):
@@ -43,8 +44,8 @@ class ChurnPredictionResponse(BaseModel):
     model_variant: str = Field(default="default", description="Model variant used for prediction")
     model_version: str = Field(default="unknown", description="Model version")
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "prediction": 1,
                 "probability": 0.73,
@@ -52,6 +53,7 @@ class ChurnPredictionResponse(BaseModel):
                 "model_version": "production",
             }
         }
+    }
 
 
 class HealthResponse(BaseModel):
@@ -65,8 +67,8 @@ class HealthResponse(BaseModel):
         default=False, description="Whether feature store is available"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "status": "healthy",
                 "model_loaded": True,
@@ -75,6 +77,7 @@ class HealthResponse(BaseModel):
                 "feature_store_available": True,
             }
         }
+    }
 
 
 class CustomerIdRequest(BaseModel):
@@ -82,12 +85,13 @@ class CustomerIdRequest(BaseModel):
 
     customer_id: str = Field(..., description="Customer ID for feature retrieval")
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "customer_id": "CUST_000123",
             }
         }
+    }
 
 
 class FeatureStoreHealthResponse(BaseModel):
@@ -103,8 +107,8 @@ class FeatureStoreHealthResponse(BaseModel):
     )
     error: str = Field(default=None, description="Error message if unhealthy")
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "available": True,
                 "online_store_healthy": True,
@@ -113,3 +117,4 @@ class FeatureStoreHealthResponse(BaseModel):
                 "error": None,
             }
         }
+    }

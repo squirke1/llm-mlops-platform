@@ -26,6 +26,7 @@ COPY --from=builder /usr/local /usr/local
 # Copy application code
 COPY src/ ./src/
 COPY api/ ./api/
+COPY feature_store/ ./feature_store/
 
 # Create models directory and train model
 RUN mkdir -p models && \

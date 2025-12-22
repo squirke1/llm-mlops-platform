@@ -1,7 +1,5 @@
 """Tests for feature store integration."""
 
-import os
-import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock, patch
