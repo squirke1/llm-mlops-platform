@@ -1,6 +1,6 @@
 """Pydantic schemas for request/response validation."""
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ChurnPredictionRequest(BaseModel):
@@ -14,7 +14,8 @@ class ChurnPredictionRequest(BaseModel):
     )
     num_support_tickets: int = Field(..., ge=0, le=50, description="Number of support tickets")
 
-    @validator("contract_type")
+    @field_validator("contract_type")
+    @classmethod
     def validate_contract_type(cls, v):
         """Validate contract type is one of allowed values."""
         allowed = ["Month-to-month", "One year", "Two year"]
@@ -22,8 +23,8 @@ class ChurnPredictionRequest(BaseModel):
             raise ValueError(f"contract_type must be one of {allowed}")
         return v
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "tenure_months": 24,
                 "monthly_charges": 79.99,
@@ -32,6 +33,7 @@ class ChurnPredictionRequest(BaseModel):
                 "num_support_tickets": 3,
             }
         }
+    }
 
 
 class ChurnPredictionResponse(BaseModel):
@@ -42,8 +44,8 @@ class ChurnPredictionResponse(BaseModel):
     model_variant: str = Field(default="default", description="Model variant used for prediction")
     model_version: str = Field(default="unknown", description="Model version")
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "prediction": 1,
                 "probability": 0.73,
@@ -64,8 +66,8 @@ class HealthResponse(BaseModel):
         default=False, description="Whether feature store is available"
     )
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "status": "healthy",
                 "model_loaded": True,
@@ -81,8 +83,8 @@ class CustomerIdRequest(BaseModel):
 
     customer_id: str = Field(..., description="Customer ID for feature retrieval")
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "customer_id": "CUST_000123",
             }
@@ -102,8 +104,8 @@ class FeatureStoreHealthResponse(BaseModel):
     )
     error: str = Field(default=None, description="Error message if unhealthy")
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "available": True,
                 "online_store_healthy": True,
