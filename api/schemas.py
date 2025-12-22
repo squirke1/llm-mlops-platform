@@ -53,6 +53,7 @@ class ChurnPredictionResponse(BaseModel):
                 "model_version": "production",
             }
         }
+    }
 
 
 class HealthResponse(BaseModel):
@@ -76,6 +77,7 @@ class HealthResponse(BaseModel):
                 "feature_store_available": True,
             }
         }
+    }
 
 
 class CustomerIdRequest(BaseModel):
@@ -89,6 +91,7 @@ class CustomerIdRequest(BaseModel):
                 "customer_id": "CUST_000123",
             }
         }
+    }
 
 
 class FeatureStoreHealthResponse(BaseModel):
@@ -114,3 +117,4 @@ class FeatureStoreHealthResponse(BaseModel):
                 "error": None,
             }
         }
+    }
