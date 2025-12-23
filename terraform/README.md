@@ -2,49 +2,49 @@
 
 Infrastructure as Code (IaC) for the MLOps Platform using Terraform.
 
-## 🏗️ Architecture Overview
+##  Architecture Overview
 
 This Terraform configuration deploys a complete AWS infrastructure for the ML Churn Prediction API:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        AWS Account                           │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │              VPC (10.0.0.0/16)                     │    │
-│  │                                                    │    │
-│  │  ┌─────────────────┐  ┌──────────────────┐       │    │
-│  │  │ Public Subnets  │  │ Private Subnets  │       │    │
-│  │  │  - NAT Gateway  │  │  - EKS Nodes     │       │    │
-│  │  │  - IGW          │  │  - App Pods      │       │    │
-│  │  └─────────────────┘  └──────────────────┘       │    │
-│  │                                                    │    │
-│  │  ┌──────────────────────────────────────────┐    │    │
-│  │  │         EKS Cluster (1.28)               │    │    │
-│  │  │  - 2-6 t3.medium nodes                   │    │    │
-│  │  │  - Auto-scaling enabled                  │    │    │
-│  │  │  - IRSA for S3 access                    │    │    │
-│  │  └──────────────────────────────────────────┘    │    │
-│  └────────────────────────────────────────────────────┘    │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │                 S3 Buckets                         │    │
-│  │  - mlops-platform-prod-models                      │    │
-│  │  - mlops-platform-prod-data                        │    │
-│  │  - mlops-platform-prod-artifacts                   │    │
-│  └────────────────────────────────────────────────────┘    │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │          ECR (Container Registry)                  │    │
-│  │  - mlops-platform-prod-api                         │    │
-│  │  - Image scanning enabled                          │    │
-│  │  - Lifecycle policies                              │    │
-│  └────────────────────────────────────────────────────┘    │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+
+                        AWS Account                           
+                                                              
+      
+                VPC (10.0.0.0/16)                         
+                                                          
+                 
+     Public Subnets     Private Subnets             
+      - NAT Gateway      - EKS Nodes                
+      - IGW              - App Pods                 
+                 
+                                                          
+            
+             EKS Cluster (1.28)                       
+      - 2-6 t3.medium nodes                           
+      - Auto-scaling enabled                          
+      - IRSA for S3 access                            
+            
+      
+                                                              
+      
+                   S3 Buckets                             
+    - mlops-platform-prod-models                          
+    - mlops-platform-prod-data                            
+    - mlops-platform-prod-artifacts                       
+      
+                                                              
+      
+            ECR (Container Registry)                      
+    - mlops-platform-prod-api                             
+    - Image scanning enabled                              
+    - Lifecycle policies                                  
+      
+                                                              
+
 ```
 
-## 📦 Resources Created
+##  Resources Created
 
 ### Networking (VPC Module)
 - **VPC**: 10.0.0.0/16 with DNS enabled
@@ -79,7 +79,7 @@ This Terraform configuration deploys a complete AWS infrastructure for the ML Ch
 - **Image Scanning**: Automatic vulnerability scanning
 - **Lifecycle Policy**: Keep last 10 tagged images, expire untagged after 7 days
 
-## 🚀 Prerequisites
+##  Prerequisites
 
 ### Install Tools
 ```bash
@@ -123,7 +123,7 @@ aws dynamodb create-table \
   --region us-east-1
 ```
 
-## 📝 Configuration
+##  Configuration
 
 ### Variables
 Edit `terraform.tfvars` to customize:
@@ -135,7 +135,7 @@ Edit `terraform.tfvars` to customize:
 - **eks_node_desired_size**: Number of nodes (default: 3)
 - **single_nat_gateway**: Use 1 NAT for cost savings (default: true)
 
-## 🛠️ Deployment
+##  Deployment
 
 ### Initialize Terraform
 ```bash
@@ -173,7 +173,7 @@ kubectl get nodes
 kubectl get namespaces
 ```
 
-## 🔄 Deploy Application to EKS
+##  Deploy Application to EKS
 
 ### Build and Push Docker Image
 ```bash
@@ -217,7 +217,7 @@ kubectl get all -n mlops-platform
 kubectl logs -n mlops-platform -l app=churn-prediction-api --tail=50
 ```
 
-## 📊 Monitoring & Management
+##  Monitoring & Management
 
 ### View Resources
 ```bash
@@ -258,7 +258,7 @@ aws ecr list-images \
   --region us-east-1
 ```
 
-## 💰 Cost Optimization
+##  Cost Optimization
 
 ### Current Configuration
 - **NAT Gateway**: Single NAT ($32/month) vs multi-AZ ($64/month)
@@ -281,7 +281,7 @@ terraform apply -var='eks_node_instance_types=["t3.small"]'
 terraform destroy
 ```
 
-## 🧹 Cleanup
+##  Cleanup
 
 ### Destroy Infrastructure
 ```bash
@@ -307,17 +307,17 @@ aws ecr batch-delete-image \
   --image-ids imageTag=latest
 ```
 
-## 🔐 Security Best Practices
+##  Security Best Practices
 
 ### Implemented
-✅ Private subnets for EKS nodes
-✅ NAT Gateway for secure outbound access
-✅ Security groups restricting traffic
-✅ S3 buckets private by default
-✅ S3 encryption at rest (AES256)
-✅ ECR image scanning enabled
-✅ IRSA for fine-grained IAM permissions
-✅ EKS cluster logs enabled
+ Private subnets for EKS nodes
+ NAT Gateway for secure outbound access
+ Security groups restricting traffic
+ S3 buckets private by default
+ S3 encryption at rest (AES256)
+ ECR image scanning enabled
+ IRSA for fine-grained IAM permissions
+ EKS cluster logs enabled
 
 ### Additional Recommendations
 - Enable AWS WAF on ingress
@@ -326,7 +326,7 @@ aws ecr batch-delete-image \
 - Enable GuardDuty for threat detection
 - Configure AWS Config for compliance
 
-## 🎯 Key Terraform Concepts
+##  Key Terraform Concepts
 
 ### Modules
 Reusable, self-contained infrastructure components. Each module (vpc, eks, s3, iam, ecr) encapsulates related resources.
@@ -346,7 +346,7 @@ S3 lifecycle rules automatically transition objects to cheaper storage classes, 
 ### IRSA (IAM Roles for Service Accounts)
 Kubernetes pods assume IAM roles without storing credentials, following AWS security best practices.
 
-## 🎤 Interview Talking Points
+##  Interview Talking Points
 
 1. **Infrastructure as Code**: Version-controlled, repeatable infrastructure using Terraform
 2. **Modular Design**: Reusable modules for vpc, eks, s3, iam, ecr
@@ -359,7 +359,7 @@ Kubernetes pods assume IAM roles without storing credentials, following AWS secu
 9. **Storage Strategy**: Separate S3 buckets for models, data, artifacts with versioning
 10. **Observability**: EKS cluster logs, CloudWatch integration ready
 
-## 📚 Next Steps
+##  Next Steps
 
 After deploying infrastructure:
 1. **Phase 7**: Set up CI/CD pipeline with GitHub Actions

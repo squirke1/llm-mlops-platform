@@ -1,9 +1,9 @@
 # Phase 0: Project Foundation Setup
 
-## 🎯 Goal
+##  Goal
 Set up a professional project foundation following industry best practices.
 
-## 🧠 What Experienced Developers Do First
+##  What Experienced Developers Do First
 
 Before writing any code, they:
 1. **Plan the architecture** - Know what you're building
@@ -13,7 +13,7 @@ Before writing any code, they:
 5. **Configure tools** - Linters, formatters, type checkers
 6. **Write documentation** - README, contributing guides
 
-## 📋 Tasks
+##  Tasks
 
 ### 1. Project Structure (5 min)
 ```bash
@@ -110,7 +110,7 @@ lint:
 
 **Why?** Standardized commands make onboarding new developers easier.
 
-## ✅ Completion Checklist
+##  Completion Checklist
 
 - [ ] Project directories created
 - [ ] Virtual environment activated
@@ -119,7 +119,7 @@ lint:
 - [ ] Initial Git commit made
 - [ ] Can run `make format` successfully
 
-## 🎓 Professional Tips
+##  Professional Tips
 
 1. **Don't skip setup** - A solid foundation saves hours later
 2. **Document as you go** - Future you will thank you
@@ -127,19 +127,19 @@ lint:
 4. **Test the setup** - Make sure others can replicate it
 5. **Commit early, commit often** - Small, atomic commits
 
-## 🚀 Next Steps
+##  Next Steps
 
 Once Phase 0 is complete, you'll have:
-- ✅ Professional project structure
-- ✅ Reproducible environment
-- ✅ Quality tools configured
-- ✅ Ready to write code
+-  Professional project structure
+-  Reproducible environment
+-  Quality tools configured
+-  Ready to write code
 
 **Move to Phase 1**: Build the first ML model with proper structure.
 
 ---
 
-## 📝 Commands Summary
+##  Commands Summary
 
 ```bash
 # Complete Phase 0 setup
