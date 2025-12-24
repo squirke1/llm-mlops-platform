@@ -66,3 +66,6 @@ htmlcov/
 /*.md
 !README.md
 !ROADMAP.md
+blog-post.md
+ARCHITECTURE_DIAGRAMS.md
+LEARNING_GUIDE.md
