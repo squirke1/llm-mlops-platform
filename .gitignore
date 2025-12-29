@@ -61,11 +61,3 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Documentation (only root-level MDs except README and ROADMAP)
-/*.md
-!README.md
-!ROADMAP.md
-blog-post.md
-ARCHITECTURE_DIAGRAMS.md
-LEARNING_GUIDE.md
