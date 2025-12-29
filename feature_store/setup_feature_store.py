@@ -28,7 +28,7 @@ def initialize_feature_store(repo_path: str = "feature_store"):
         print("\nApplying feature definitions to registry...")
         store.apply([])  # Empty list to apply all features from repo
 
-        print("✓ Feature store initialized successfully")
+        print(" Feature store initialized successfully")
 
         # List registered features
         print("\nRegistered Feature Views:")
@@ -77,7 +77,7 @@ def materialize_features(
             end_date=end_date,
         )
 
-        print("✓ Features materialized successfully")
+        print(" Features materialized successfully")
 
         # Verify materialization
         print("\nVerifying online store...")
@@ -93,12 +93,12 @@ def materialize_features(
                     entity_rows=entity_rows,
                 )
                 df = features.to_df()
-                print(f"✓ Successfully retrieved {len(df.columns)} features from online store")
+                print(f" Successfully retrieved {len(df.columns)} features from online store")
             else:
-                print("⚠ No feature services found for verification")
+                print(" No feature services found for verification")
 
         except Exception as e:
-            print(f"⚠ Online store verification failed: {e}")
+            print(f" Online store verification failed: {e}")
 
     except Exception as e:
         print(f"Error materializing features: {e}")

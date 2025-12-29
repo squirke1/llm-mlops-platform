@@ -7,17 +7,17 @@ The MLOps platform now includes a Feature Store powered by Feast for centralized
 ## Architecture
 
 ```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│  Data Sources   │─────▶│  Feast Registry  │◀────▶│  Online Store   │
-│  (Parquet/S3)   │      │   (SQLite/S3)    │      │ (SQLite/DynamoDB)│
-└─────────────────┘      └──────────────────┘      └─────────────────┘
-                                  │                          │
-                                  │                          │
-                                  ▼                          ▼
-                         ┌─────────────────┐      ┌─────────────────┐
-                         │ Training        │      │ Serving (API)   │
-                         │ Pipeline        │      │ Real-time       │
-                         └─────────────────┘      └─────────────────┘
+            
+  Data Sources     Feast Registry    Online Store   
+  (Parquet/S3)            (SQLite/S3)           (SQLite/DynamoDB)
+            
+                                                            
+                                                            
+                                                            
+                               
+                          Training               Serving (API)   
+                          Pipeline               Real-time       
+                               
 ```
 
 ## Components

@@ -5,36 +5,36 @@ High-level architecture of the MLOps platform for churn prediction.
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         External Users                           │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         │ HTTPS
-                         │
-┌────────────────────────▼────────────────────────────────────────┐
-│                    Ingress Controller                            │
-│                   (NGINX + TLS/SSL)                             │
-└────────────┬──────────────────┬──────────────────┬──────────────┘
-             │                  │                  │
-    ┌────────▼────────┐ ┌──────▼───────┐ ┌───────▼────────┐
-    │   Churn API     │ │    MLflow    │ │    Grafana     │
-    │   (FastAPI)     │ │    Server    │ │  (Monitoring)  │
-    └────────┬────────┘ └──────┬───────┘ └───────┬────────┘
-             │                  │                  │
-             │          ┌───────▼────────┐        │
-             │          │   PostgreSQL   │        │
-             │          │  (Metadata DB) │        │
-             │          └────────────────┘        │
-             │                                     │
-             │          ┌────────────────┐        │
-             └─────────►│  MLflow Model  │        │
-                        │    Registry    │        │
-                        └────────────────┘        │
-                                                   │
-                        ┌────────────────┐        │
-                        │   Prometheus   │◄───────┘
-                        │  (Metrics DB)  │
-                        └────────────────┘
+
+                         External Users                           
+
+                         
+                          HTTPS
+                         
+
+                    Ingress Controller                            
+                   (NGINX + TLS/SSL)                             
+
+                                                 
+      
+       Churn API          MLflow         Grafana     
+       (FastAPI)          Server       (Monitoring)  
+      
+                                                 
+                               
+                          PostgreSQL           
+                         (Metadata DB)         
+                               
+                                                  
+                               
+               MLflow Model          
+                            Registry            
+                                
+                                                   
+                                
+                           Prometheus   
+                          (Metrics DB)  
+                        
 ```
 
 ## Component Details
@@ -149,39 +149,39 @@ High-level architecture of the MLOps platform for churn prediction.
 
 ```
 1. Data Ingestion
-   └─> Training Script (train.py)
-       ├─> MLflow Experiment Tracking
-       │   ├─> Log parameters
-       │   ├─> Log metrics
-       │   └─> Log artifacts
-       └─> Model Registry
-           ├─> Register model
-           └─> Tag as Production/Staging
+   > Training Script (train.py)
+       > MLflow Experiment Tracking
+          > Log parameters
+          > Log metrics
+          > Log artifacts
+       > Model Registry
+           > Register model
+           > Tag as Production/Staging
 ```
 
 ### Prediction Pipeline
 
 ```
 1. Client Request
-   └─> Ingress Controller
-       └─> Churn API
-           ├─> Load Model (from registry or local)
-           ├─> Preprocessing
-           ├─> Prediction
-           ├─> Log metrics to Prometheus
-           └─> Return result
+   > Ingress Controller
+       > Churn API
+           > Load Model (from registry or local)
+           > Preprocessing
+           > Prediction
+           > Log metrics to Prometheus
+           > Return result
 ```
 
 ### Monitoring Pipeline
 
 ```
 1. Application Metrics
-   └─> Prometheus (scrape every 15s)
-       ├─> Evaluate alert rules
-       │   └─> Alertmanager
-       │       └─> Slack/Email notifications
-       └─> Store time-series data
-           └─> Grafana queries and visualizations
+   > Prometheus (scrape every 15s)
+       > Evaluate alert rules
+          > Alertmanager
+              > Slack/Email notifications
+       > Store time-series data
+           > Grafana queries and visualizations
 ```
 
 ## Scalability

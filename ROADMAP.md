@@ -8,42 +8,42 @@ Build a production-grade MLOps platform showcasing industry-standard tools and p
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          PRODUCTION ARCHITECTURE                         │
-└─────────────────────────────────────────────────────────────────────────┘
 
-┌──────────────────┐         ┌──────────────────┐         ┌──────────────┐
-│   Data Sources   │────────▶│   Data Pipeline  │────────▶│  Feature     │
-│  (S3/Local)      │         │  (Validation)    │         │  Store       │
-└──────────────────┘         └──────────────────┘         └──────────────┘
-                                                                  │
-                                                                  ▼
-┌──────────────────┐         ┌──────────────────┐         ┌──────────────┐
-│   CI/CD          │────────▶│  Model Training  │────────▶│  Model       │
-│  (GitHub         │         │  (Scikit-learn)  │         │  Registry    │
-│   Actions)       │         │                  │         │  (MLflow/S3) │
-└──────────────────┘         └──────────────────┘         └──────────────┘
-                                                                  │
-                                                                  ▼
-┌──────────────────┐         ┌──────────────────┐         ┌──────────────┐
-│   Monitoring     │◀────────│   Kubernetes     │◀────────│  Docker      │
-│  (Prometheus,    │         │   Cluster (EKS)  │         │  Container   │
-│   Grafana)       │         │                  │         │              │
-└──────────────────┘         └──────────────────┘         └──────────────┘
-                                     │
-                                     ▼
-                            ┌──────────────────┐
-                            │   FastAPI        │
-                            │   REST API       │
-                            │   /predict       │
-                            └──────────────────┘
+                          PRODUCTION ARCHITECTURE                         
+
+
+                  
+   Data Sources      Data Pipeline    Feature     
+  (S3/Local)                 (Validation)               Store       
+                  
+                                                                  
+                                                                  
+                  
+   CI/CD            Model Training    Model       
+  (GitHub                    (Scikit-learn)             Registry    
+   Actions)                                             (MLflow/S3) 
+                  
+                                                                  
+                                                                  
+                  
+   Monitoring        Kubernetes       Docker      
+  (Prometheus,                Cluster (EKS)             Container   
+   Grafana)                                                         
+                  
+                                     
+                                     
+                            
+                               FastAPI        
+                               REST API       
+                               /predict       
+                            
 ```
 
 ---
 
 ## Phase Breakdown
 
-### ✅ Phase 0: Project Foundation (COMPLETED)
+###  Phase 0: Project Foundation (COMPLETED)
 **Branch:** `main` → `develop`
 
 **Deliverables:**
@@ -59,7 +59,7 @@ Build a production-grade MLOps platform showcasing industry-standard tools and p
 
 ---
 
-### 🚧 Phase 1: Basic ML Model (IN PROGRESS)
+###  Phase 1: Basic ML Model (IN PROGRESS)
 **Branch:** `feature/phase-1-ml-model`
 **Status:** 3/5 steps complete
 
@@ -84,7 +84,7 @@ feature/phase-1-ml-model → develop (--no-ff merge)
 
 ---
 
-### 📦 Phase 2: Data Pipeline
+###  Phase 2: Data Pipeline
 **Branch:** `feature/phase-2-data-pipeline`
 
 **Deliverables:**
@@ -97,13 +97,13 @@ feature/phase-1-ml-model → develop (--no-ff merge)
 **New Files:**
 ```
 src/
-├── preprocessing.py    # Feature encoding, scaling
-├── validation.py       # Schema validation, data quality
-└── pipeline.py         # End-to-end data pipeline
+ preprocessing.py    # Feature encoding, scaling
+ validation.py       # Schema validation, data quality
+ pipeline.py         # End-to-end data pipeline
 
 tests/
-├── test_preprocessing.py
-└── test_validation.py
+ test_preprocessing.py
+ test_validation.py
 ```
 
 **Tools Introduced:** 
@@ -119,7 +119,7 @@ tests/
 
 ---
 
-### 🚀 Phase 3: REST API Development
+###  Phase 3: REST API Development
 **Branch:** `feature/phase-3-api`
 
 **Deliverables:**
@@ -133,13 +133,13 @@ tests/
 **New Files:**
 ```
 api/
-├── __init__.py
-├── app.py              # FastAPI application
-├── schemas.py          # Pydantic models
-└── routes.py           # API endpoints
+ __init__.py
+ app.py              # FastAPI application
+ schemas.py          # Pydantic models
+ routes.py           # API endpoints
 
 tests/
-└── test_api.py         # API integration tests
+ test_api.py         # API integration tests
 
 requirements.txt        # Add: fastapi, uvicorn, pydantic
 ```
@@ -174,7 +174,7 @@ Response:
 
 ---
 
-### 🐳 Phase 4: Docker Containerization
+###  Phase 4: Docker Containerization
 **Branch:** `feature/phase-4-docker`
 
 **Deliverables:**
@@ -190,7 +190,7 @@ Dockerfile              # Multi-stage build
 docker-compose.yml      # Local orchestration
 .dockerignore          # Exclude unnecessary files
 scripts/
-└── docker-entrypoint.sh
+ docker-entrypoint.sh
 ```
 
 **Dockerfile Strategy:**
@@ -216,7 +216,7 @@ FROM python:3.9-slim
 
 ---
 
-### ☸️ Phase 5: Kubernetes Deployment
+###  Phase 5: Kubernetes Deployment
 **Branch:** `feature/phase-5-kubernetes`
 
 **Deliverables:**
@@ -230,28 +230,28 @@ FROM python:3.9-slim
 **New Files:**
 ```
 k8s/
-├── namespace.yaml
-├── deployment.yaml     # Pod specification
-├── service.yaml        # ClusterIP service
-├── ingress.yaml        # External access
-├── configmap.yaml      # Configuration
-├── secret.yaml         # Sensitive data
-└── hpa.yaml           # Horizontal Pod Autoscaler
+ namespace.yaml
+ deployment.yaml     # Pod specification
+ service.yaml        # ClusterIP service
+ ingress.yaml        # External access
+ configmap.yaml      # Configuration
+ secret.yaml         # Sensitive data
+ hpa.yaml           # Horizontal Pod Autoscaler
 ```
 
 **Deployment Architecture:**
 ```
 Internet
-   │
-   ▼
+   
+   
 [Ingress Controller]
-   │
-   ▼
+   
+   
 [Service: churn-api]
-   │
-   ├─▶ [Pod 1: API + Model]
-   ├─▶ [Pod 2: API + Model]
-   └─▶ [Pod 3: API + Model]
+   
+    [Pod 1: API + Model]
+    [Pod 2: API + Model]
+    [Pod 3: API + Model]
 ```
 
 **Tools Introduced:** Kubernetes, kubectl, Minikube (local), Helm (optional)
@@ -266,7 +266,7 @@ Internet
 
 ---
 
-### ☁️ Phase 6: AWS Cloud Infrastructure
+###  Phase 6: AWS Cloud Infrastructure
 **Branch:** `feature/phase-6-aws`
 
 **Deliverables:**
@@ -279,35 +279,35 @@ Internet
 **Infrastructure:**
 ```
 AWS Account
-│
-├── S3 Buckets
-│   ├── data-bucket/           # Raw data, processed data
-│   ├── model-bucket/          # Trained models, versions
-│   └── artifacts-bucket/      # Logs, metrics
-│
-├── EKS Cluster (or EC2)
-│   ├── Worker Nodes (t3.medium)
-│   ├── Load Balancer
-│   └── Auto Scaling Group
-│
-├── IAM
-│   ├── API Service Role       # Access to S3, CloudWatch
-│   └── CI/CD Role             # Deployment permissions
-│
-└── CloudWatch
-    ├── Logs
-    └── Metrics
+
+ S3 Buckets
+    data-bucket/           # Raw data, processed data
+    model-bucket/          # Trained models, versions
+    artifacts-bucket/      # Logs, metrics
+
+ EKS Cluster (or EC2)
+    Worker Nodes (t3.medium)
+    Load Balancer
+    Auto Scaling Group
+
+ IAM
+    API Service Role       # Access to S3, CloudWatch
+    CI/CD Role             # Deployment permissions
+
+ CloudWatch
+     Logs
+     Metrics
 ```
 
 **New Files:**
 ```
 terraform/               # or cdk/ for AWS CDK
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── s3.tf               # S3 bucket definitions
-├── eks.tf              # EKS cluster config
-└── iam.tf              # Roles and policies
+ main.tf
+ variables.tf
+ outputs.tf
+ s3.tf               # S3 bucket definitions
+ eks.tf              # EKS cluster config
+ iam.tf              # Roles and policies
 
 .env.example            # Environment template
 ```
@@ -323,7 +323,7 @@ terraform/               # or cdk/ for AWS CDK
 
 ---
 
-### 🔄 Phase 7: CI/CD Pipeline
+###  Phase 7: CI/CD Pipeline
 **Branch:** `feature/phase-7-cicd`
 
 **Deliverables:**
@@ -337,44 +337,44 @@ terraform/               # or cdk/ for AWS CDK
 **New Files:**
 ```
 .github/
-└── workflows/
-    ├── test.yml         # Run on every PR
-    ├── build.yml        # Build Docker image
-    ├── deploy-dev.yml   # Deploy to dev on develop merge
-    ├── deploy-prod.yml  # Deploy to prod on main merge
-    └── model-train.yml  # Scheduled model retraining
+ workflows/
+     test.yml         # Run on every PR
+     build.yml        # Build Docker image
+     deploy-dev.yml   # Deploy to dev on develop merge
+     deploy-prod.yml  # Deploy to prod on main merge
+     model-train.yml  # Scheduled model retraining
 ```
 
 **Pipeline Flow:**
 ```
-┌─────────────┐
-│  Git Push   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Run Tests  │ ← pytest, flake8, mypy
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Build Image │ ← docker build
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Push to ECR │ ← AWS Container Registry
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│Deploy to K8s│ ← kubectl apply
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│Smoke Tests  │ ← API health check
-└─────────────┘
+
+  Git Push   
+
+       
+       
+
+  Run Tests   ← pytest, flake8, mypy
+
+       
+       
+
+ Build Image  ← docker build
+
+       
+       
+
+ Push to ECR  ← AWS Container Registry
+
+       
+       
+
+Deploy to K8s ← kubectl apply
+
+       
+       
+
+Smoke Tests   ← API health check
+
 ```
 
 **Tools Introduced:** GitHub Actions, AWS ECR
@@ -388,7 +388,7 @@ terraform/               # or cdk/ for AWS CDK
 
 ---
 
-### 📊 Phase 8: Monitoring & Observability
+###  Phase 8: Monitoring & Observability
 **Branch:** `feature/phase-8-monitoring`
 
 **Deliverables:**
@@ -402,19 +402,19 @@ terraform/               # or cdk/ for AWS CDK
 **New Files:**
 ```
 monitoring/
-├── prometheus/
-│   ├── prometheus.yml
-│   └── alert-rules.yml
-├── grafana/
-│   ├── dashboards/
-│   │   ├── api-metrics.json
-│   │   └── model-metrics.json
-│   └── datasources.yml
-└── docker-compose.monitoring.yml
+ prometheus/
+    prometheus.yml
+    alert-rules.yml
+ grafana/
+    dashboards/
+       api-metrics.json
+       model-metrics.json
+    datasources.yml
+ docker-compose.monitoring.yml
 
 src/
-├── metrics.py          # Custom Prometheus metrics
-└── logging_config.py   # Structured logging setup
+ metrics.py          # Custom Prometheus metrics
+ logging_config.py   # Structured logging setup
 ```
 
 **Metrics Tracked:**
@@ -427,17 +427,17 @@ src/
 
 **Dashboard Example:**
 ```
-┌──────────────────────────────────────┐
-│  API Performance Dashboard           │
-├──────────────────────────────────────┤
-│  Request Rate: 150 req/min           │
-│  Avg Latency: 45ms                   │
-│  Error Rate: 0.2%                    │
-│                                      │
-│  [Graph: Request Latency Over Time]  │
-│  [Graph: Prediction Distribution]    │
-│  [Graph: Model Accuracy Trend]       │
-└──────────────────────────────────────┘
+
+  API Performance Dashboard           
+
+  Request Rate: 150 req/min           
+  Avg Latency: 45ms                   
+  Error Rate: 0.2%                    
+                                      
+  [Graph: Request Latency Over Time]  
+  [Graph: Prediction Distribution]    
+  [Graph: Model Accuracy Trend]       
+
 ```
 
 **Tools Introduced:** Prometheus, Grafana, Python logging
@@ -451,7 +451,7 @@ src/
 
 ---
 
-### 🧪 Phase 9: Model Versioning & Experiment Tracking
+###  Phase 9: Model Versioning & Experiment Tracking
 **Branch:** `feature/phase-9-mlflow`
 
 **Deliverables:**
@@ -465,15 +465,15 @@ src/
 **New Files:**
 ```
 mlflow/
-├── docker-compose.mlflow.yml
-└── mlflow_config.py
+ docker-compose.mlflow.yml
+ mlflow_config.py
 
 src/
-├── experiment.py       # MLflow experiment logging
-└── registry.py         # Model registry operations
+ experiment.py       # MLflow experiment logging
+ registry.py         # Model registry operations
 
 scripts/
-└── promote_model.py    # Production model promotion
+ promote_model.py    # Production model promotion
 ```
 
 **MLflow Integration:**
@@ -514,7 +514,7 @@ Experiment → Staging → Production → Archived
 
 ---
 
-### 🔒 Phase 10: Production Hardening
+###  Phase 10: Production Hardening
 **Branch:** `feature/phase-10-production`
 
 **Deliverables:**
@@ -530,22 +530,22 @@ Experiment → Staging → Production → Archived
 **New Files:**
 ```
 src/
-├── auth.py             # Authentication middleware
-├── rate_limiter.py     # Rate limiting
-└── db.py               # Database operations
+ auth.py             # Authentication middleware
+ rate_limiter.py     # Rate limiting
+ db.py               # Database operations
 
 k8s/
-├── hpa.yaml            # Auto-scaling rules
-└── network-policy.yaml # Network security
+ hpa.yaml            # Auto-scaling rules
+ network-policy.yaml # Network security
 
 docs/
-├── API.md              # API documentation
-├── DEPLOYMENT.md       # Deployment guide
-└── RUNBOOK.md          # Operational runbook
+ API.md              # API documentation
+ DEPLOYMENT.md       # Deployment guide
+ RUNBOOK.md          # Operational runbook
 
 scripts/
-├── backup.sh           # Backup automation
-└── security-scan.sh    # Container scanning
+ backup.sh           # Backup automation
+ security-scan.sh    # Container scanning
 ```
 
 **Security Enhancements:**
@@ -615,19 +615,19 @@ scripts/
 
 ```
 main (production)
-  │
-  └─── develop (integration)
-         │
-         ├─── feature/phase-1-ml-model
-         ├─── feature/phase-2-data-pipeline
-         ├─── feature/phase-3-api
-         ├─── feature/phase-4-docker
-         ├─── feature/phase-5-kubernetes
-         ├─── feature/phase-6-aws
-         ├─── feature/phase-7-cicd
-         ├─── feature/phase-8-monitoring
-         ├─── feature/phase-9-mlflow
-         └─── feature/phase-10-production
+  
+   develop (integration)
+         
+          feature/phase-1-ml-model
+          feature/phase-2-data-pipeline
+          feature/phase-3-api
+          feature/phase-4-docker
+          feature/phase-5-kubernetes
+          feature/phase-6-aws
+          feature/phase-7-cicd
+          feature/phase-8-monitoring
+          feature/phase-9-mlflow
+          feature/phase-10-production
 ```
 
 **Merge Strategy:**
@@ -654,24 +654,24 @@ main (production)
 
 By project completion, you will have:
 
-✅ **Functional ML System**
+ **Functional ML System**
 - Trained churn prediction model
 - REST API for real-time predictions
 - Automated retraining pipeline
 
-✅ **Production Infrastructure**
+ **Production Infrastructure**
 - Containerized application
 - Kubernetes orchestration
 - AWS cloud deployment
 - CI/CD automation
 
-✅ **Operational Excellence**
+ **Operational Excellence**
 - Comprehensive monitoring
 - Model versioning & tracking
 - Security hardening
 - Complete documentation
 
-✅ **Portfolio Showcase**
+ **Portfolio Showcase**
 - GitHub repository with professional structure
 - Live demo deployment
 - Architecture diagrams

@@ -2,7 +2,7 @@
 
 This directory contains Kubernetes manifests for deploying the ML Churn Prediction API.
 
-## 📦 What's Included
+##  What's Included
 
 - **namespace.yaml** - Isolated namespace for MLOps resources
 - **configmap.yaml** - Non-sensitive configuration (model path, log level)
@@ -13,7 +13,7 @@ This directory contains Kubernetes manifests for deploying the ML Churn Predicti
 - **hpa.yaml** - Horizontal Pod Autoscaler (scales 3-10 pods based on CPU/memory)
 - **kustomization.yaml** - Kustomize configuration for managing manifests
 
-## 🚀 Local Testing with Minikube
+##  Local Testing with Minikube
 
 ### Prerequisites
 ```bash
@@ -98,7 +98,7 @@ minikube stop
 minikube delete
 ```
 
-## 🏗️ Production Deployment (AWS EKS)
+##  Production Deployment (AWS EKS)
 
 ### Prerequisites
 - AWS CLI configured
@@ -117,7 +117,7 @@ kubectl apply -k k8s/
 kubectl get ingress -n mlops-platform
 ```
 
-## 🔍 Key Kubernetes Concepts
+##  Key Kubernetes Concepts
 
 ### Namespace
 Isolates resources from other applications in the cluster. Like a virtual cluster within a cluster.
@@ -148,7 +148,7 @@ Automatically scales pods based on CPU/memory metrics. Scales from 3 to 10 repli
 - **Liveness Probe**: Restarts pod if unhealthy
 - **Readiness Probe**: Removes pod from load balancer if not ready
 
-## 📊 Monitoring & Debugging
+##  Monitoring & Debugging
 
 ```bash
 # Describe deployment
@@ -167,7 +167,7 @@ kubectl port-forward -n mlops-platform svc/churn-prediction-api 8000:80
 kubectl exec -it -n mlops-platform <pod-name> -- /bin/bash
 ```
 
-## 🎯 Interview Talking Points
+##  Interview Talking Points
 
 1. **Scalability**: HPA automatically scales from 3-10 pods based on load
 2. **High Availability**: 3 replicas across nodes with anti-affinity
