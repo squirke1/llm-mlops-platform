@@ -6,11 +6,11 @@ We use a simplified Git Flow approach suitable for solo/small team projects:
 
 ```
 main (production-ready code)
-  ├── develop (integration branch)
-  │    ├── feature/churn-model
-  │    ├── feature/api-endpoint
-  │    └── feature/docker-setup
-  └── hotfix/critical-bug
+   develop (integration branch)
+       feature/churn-model
+       feature/api-endpoint
+       feature/docker-setup
+   hotfix/critical-bug
 ```
 
 ## Branch Types

@@ -1,6 +1,6 @@
 # Phase 1: Basic ML Model
 
-## 🎯 Goal
+##  Goal
 Build a simple but functional customer churn prediction model.
 
 ## What You'll Build
@@ -212,13 +212,13 @@ git checkout develop
 git merge feature/phase-1-ml-model --no-ff
 ```
 
-## ✅ Phase 1 Complete!
+##  Phase 1 Complete!
 
 You now have:
-- ✅ Working ML model
-- ✅ Data generation
-- ✅ Training pipeline
-- ✅ Model persistence
-- ✅ Unit tests
+-  Working ML model
+-  Data generation
+-  Training pipeline
+-  Model persistence
+-  Unit tests
 
 **Next**: Phase 2 - Data Pipeline (preprocessing, validation)

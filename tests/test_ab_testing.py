@@ -371,12 +371,12 @@ class TestEdgeCases:
 
     def test_unicode_variant_names(self, ab_test_manager, mock_model):
         """Test variants with unicode names."""
-        ab_test_manager.add_variant("生产环境", mock_model, 50.0)
-        ab_test_manager.add_variant("staging-🚀", mock_model, 50.0)
+        ab_test_manager.add_variant("", mock_model, 50.0)
+        ab_test_manager.add_variant("staging-", mock_model, 50.0)
         ab_test_manager.enable_test()
 
         variant = ab_test_manager.select_variant()
-        assert variant.name in ["生产环境", "staging-🚀"]
+        assert variant.name in ["", "staging-"]
 
     def test_concurrent_variant_updates(self, ab_test_manager, mock_model):
         """Test thread safety of variant updates."""

@@ -2,7 +2,7 @@
 
 This directory contains Kubernetes Secret templates for the MLOps platform.
 
-## ⚠️ Security Warning
+##  Security Warning
 
 **NEVER commit actual secrets to version control!**
 

@@ -24,19 +24,19 @@ make format      # Should run without errors
 ### Project Structure
 ```
 llm-mlops-platform/
-├── src/              # Source code
-├── tests/            # Unit tests
-├── data/             # Data files (gitignored)
-│   ├── raw/         # Raw data
-│   └── processed/   # Processed data
-├── models/           # Trained models (gitignored)
-├── notebooks/        # Jupyter notebooks for exploration
-├── scripts/          # Utility scripts
-├── docs/             # Documentation
-├── requirements.txt  # Python dependencies
-├── pyproject.toml   # Tool configurations
-├── Makefile         # Common commands
-└── .flake8          # Linting configuration
+ src/              # Source code
+ tests/            # Unit tests
+ data/             # Data files (gitignored)
+    raw/         # Raw data
+    processed/   # Processed data
+ models/           # Trained models (gitignored)
+ notebooks/        # Jupyter notebooks for exploration
+ scripts/          # Utility scripts
+ docs/             # Documentation
+ requirements.txt  # Python dependencies
+ pyproject.toml   # Tool configurations
+ Makefile         # Common commands
+ .flake8          # Linting configuration
 ```
 
 ### Development Tools
@@ -75,8 +75,8 @@ git commit -m "type: description"
 ## Next Steps
 
 Phase 0 is complete! Now you can:
-1. ✅ Start writing code in `src/`
-2. ✅ Add tests in `tests/`
-3. ✅ Use `make` commands for common tasks
+1.  Start writing code in `src/`
+2.  Add tests in `tests/`
+3.  Use `make` commands for common tasks
 
 See `PHASE_0.md` for details, then move to Phase 1.
