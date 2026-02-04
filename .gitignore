@@ -1,3 +1,4 @@
+diagrams/
 # Python
 __pycache__/
 *.py[cod]
@@ -63,7 +64,7 @@ Thumbs.db
 htmlcov/
 
 # Generated documentation files
-ARCHITECTURE_DIAGRAMS.md
-DOCKER.md
 LEARNING_GUIDE.md
 blog-post.md
+blog-post-v1.docx
+scripts/generate_project_doc.py
