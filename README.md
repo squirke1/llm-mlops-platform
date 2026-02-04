@@ -1,103 +1,35 @@
-# MLOps Platform - Production-Ready Customer Churn Prediction 
 
-> **Complete MLOps Platform**: Production-grade machine learning system with experiment tracking, monitoring, and automated operations.
+# LLM MLOps Platform
 
-A comprehensive MLOps platform for customer churn prediction built with modern ML engineering practices. Includes MLflow for experiment tracking, Prometheus/Grafana for monitoring, automated backups, and production-hardened security.
+## Overview
 
-##  What's Included
+This repository provides a **production-ready MLOps platform** for managing the complete machine learning lifecycle, from data ingestion and feature engineering to model training, deployment, monitoring, and CI/CD. Designed for enterprise and real-world use cases, it supports robust experimentation, scalable deployment, and operational excellence.
 
-This production-ready ML platform features:
--  Machine learning model training pipeline with MLflow tracking
--  REST API for model serving (FastAPI)
--  Automated testing and CI/CD (GitHub Actions)
--  Containerization with Docker and Kubernetes orchestration
--  Monitoring and observability (Prometheus + Grafana)
--  MLflow experiment tracking and model registry
--  Automated backup and disaster recovery
--  Production security hardening
--  Cloud deployment infrastructure (Terraform)
--  Model A/B testing with traffic routing and metrics
--  Feature Store with Feast for centralized feature management
+## Features
 
-##  Architecture
+- Machine learning model training pipeline with MLflow tracking
+- REST API for model serving (FastAPI)
+- Automated testing and CI/CD (GitHub Actions)
+- Containerization with Docker and Kubernetes orchestration
+- Monitoring and observability (Prometheus + Grafana)
+- MLflow experiment tracking and model registry
+- Automated backup and disaster recovery
+- Production security hardening
+- Cloud deployment infrastructure (Terraform)
+- Model A/B testing with traffic routing and metrics
+- Feature Store with Feast for centralized feature management
+
+## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed system architecture.
 
-**Key Components**:
+**Key Components:**
 - **API Layer**: FastAPI with prediction endpoints and health checks
 - **ML Platform**: MLflow for experiment tracking and model registry
 - **Storage**: PostgreSQL for metadata, PVCs for artifacts
 - **Monitoring**: Prometheus metrics + Grafana dashboards + Alertmanager
 - **Security**: Kubernetes RBAC, network policies, secrets management
 - **Backup**: Automated daily backups to S3 with restore procedures
-
-##  Learning Path
-
-###  Phase 0: Project Setup (Current)
-**Status**: In Progress  
-**What we'll do**:
-- [x] Initialize repository
-- [ ] Create basic project structure
-- [ ] Set up Python virtual environment
-- [ ] Install initial dependencies
-
-**Time**: 30 minutes
-
----
-
-###  Phase 1: Basic ML Model
-**What you'll learn**: Core ML fundamentals, scikit-learn basics  
-**What we'll build**:
-- Simple customer churn dataset generator
-- Train a basic Random Forest model
-- Save and load models with joblib
-- Basic command-line training script
-
-**Files to create**: `src/train_simple.py`, `src/model_simple.py`
-
----
-
-###  Phase 2: Data Pipeline
-**What you'll learn**: Data preprocessing, feature engineering  
-**What we'll build**:
-- Data preprocessing functions
-- Feature scaling and encoding
-- Data validation checks
-- Separate training and preprocessing logic
-
-**Files to create**: `src/preprocessing.py`, `src/data_validation.py`
-
----
-
-###  Phase 3: Enhanced Model Training
-**What you'll learn**: Model evaluation, hyperparameter tuning  
-**What we'll build**:
-- Multiple model types (Random Forest, Gradient Boosting)
-- Comprehensive evaluation metrics
-- Model comparison
-- Training configuration
-
-**Files to create**: `src/model.py`, `src/train.py`, `config/config.yaml`
-
----
-
-###  Phase 4: REST API
-**What you'll learn**: FastAPI, API design, validation  
-**What we'll build**:
-- FastAPI application
-- Prediction endpoint
-- Input validation with Pydantic
-- Auto-generated API docs
-- Health check endpoint
-
-**Files to create**: `src/api.py`, `src/schemas.py`
-
----
-
-###  Phase 5: Testing
-**What you'll learn**: Unit testing, pytest, test-driven development  
-**What we'll build**:
-- Unit tests for all components
 - Test fixtures
 ##  Quick Start
 
@@ -408,18 +340,7 @@ Ready for deployment to production environments.
 - **Repository**: [github.com/squirke1/llm-mlops-platform](https://github.com/squirke1/llm-mlops-platform)
 - **Issues**: [GitHub Issues](https://github.com/squirke1/llm-mlops-platform/issues)
 
-##  License
 
-**Phase 0**: Setting up the project foundation
+## License
 
-**Next Steps**:
-1. Create basic directory structure
-2. Set up Python virtual environment
-3. Install scikit-learn and pandas
-4. Ready for Phase 1!
-
----
-
-**Repository**: [llm-mlops-platform](https://github.com/squirke1/llm-mlops-platform)  
-**Author**: Stephen Quirke  
-**Purpose**: Educational MLOps showcase built incrementally
+This project is licensed under the MIT License. See the LICENSE file for details.
